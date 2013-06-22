@@ -31,11 +31,35 @@
          ))
 
 
-;;** code completion
-;;...
+;;** roby: Code navigation, documentation lookup and completion for Ruby
+(autoload 'robe-mode "robe"
+  "Improved navigation for Ruby" t)
+
+(add-hook 'ruby-mode-hook 'robe-mode)
+
+(defun ruby-mode-enable-ac ()
+  (interactive)
+  (add-to-list 'ac-sources 'ac-source-robe))
+
+(eval-after-load "ruby-mode"
+  `(progn
+     (when (and (require 'auto-complete nil t) 
+		(require 'robe-ac nil t))
+	 (add-hook 'ruby-mode-hook 'ruby-mode-enable-ac))))
 
 
-
+;;** rdebug
+;;for ruby > 1.9, install 'debugger' gem
+;;
+;;(add-to-list 'load-path "/usr/lib/ruby/gems/1.9.1/debugger-1.6.0/emacs")
+(autoload 'rdebug "rdebug-core"
+  "Invoke the rdebug Ruby debugger and start the Emacs user interface." t)
+(eval-after-load "rdebug"
+  `(progn
+    ;;rdebug-core requires package `gdb-ui', but emacs 24 renamed it to gdb-mi
+    (unless (locate-library "gdb-ui")
+      (require 'gdb-mi)
+      (provide 'gdb-ui))))
 
 
 ;;** misc
