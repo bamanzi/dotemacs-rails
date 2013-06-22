@@ -82,3 +82,8 @@
 
 ;;*** rake
 (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
+
+;;*** ruby-tools: string/symbol conversion
+(eval-after-load "ruby-mode"
+  `(progn
+     (require 'ruby-tools nil t)))
