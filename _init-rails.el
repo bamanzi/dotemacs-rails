@@ -3,7 +3,7 @@
 (autoload 'rhtml-mode "rhtml-mode"
   "Embedded Ruby Mode (RHTML)" t)
 
-;;DONE: web-mode is better
+;;TODO: which one is better?
 ;;(add-to-list 'auto-mode-alist '("\\.rhtml\\'" . rhtml-mode))
 ;;(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 
