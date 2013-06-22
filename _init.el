@@ -8,12 +8,12 @@
     )    ;;<- put cursor here, press C-x C-e
   )
 
-(add-to-list 'load-path "~/.emacs.d/lisp")
 
-(setq dotemacs-elite-dir (if load-file-name
+(setq dotemacs-rails-dir (if load-file-name
                     (file-name-directory load-file-name)
                   default-directory))
 (progn
+  ;; add folders to load-path
   (add-to-list 'load-path dotemacs-rails-dir)
   (mapc #'(lambda (file)
             (when (and (file-directory-p file)
@@ -31,11 +31,15 @@
     (defun idle-require (feature)
       (require feature)))
   
+  ;;load _init-*.el
   (mapc #'(lambda (file)
 ;;	    (unless (ignore-errors          
                   (load-file file))
 ;;          (message "Failed %s" file)))
-	(directory-files dotemacs-rails-dir 'full "^init-\.*.el$"))
+	(directory-files dotemacs-rails-dir 'full "^_init-\.*.el$"))
+
+  (add-to-list 'Info-default-directory-list (concat dotemacs-rails-dir "info"))
+  (setq Info-directory-list nil) ;;reset it to let emacs re-init
 
   (if (fboundp 'idle-require-mode)
       (idle-require-mode 1)))
