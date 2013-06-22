@@ -31,12 +31,15 @@
          ))
 
 
-;;** roby: Code navigation, documentation lookup and completion for Ruby
+;;** robe: Code navigation, documentation lookup and completion for Ruby
+
 (autoload 'robe-mode "robe"
   "Improved navigation for Ruby" t)
 
 (add-hook 'ruby-mode-hook 'robe-mode)
+(add-to-list 'ruby-mode-hook 'turn-on-eldoc-mode)
 
+;;*** enable auto-complete
 (defun ruby-mode-enable-ac ()
   (interactive)
   (add-to-list 'ac-sources 'ac-source-robe))
@@ -46,6 +49,13 @@
      (when (and (require 'auto-complete nil t) 
 		(require 'robe-ac nil t))
 	 (add-hook 'ruby-mode-hook 'ruby-mode-enable-ac))))
+
+;;*** zossima: a lightweight robe
+;;(actually, robe was forked from zossima)
+(autoload 'zossima-mode "zossima"
+  "Improved navigation for Ruby" t)
+;;(add-hook 'ruby-mode-hook 'zossima-mode)
+
 
 
 ;;** rdebug

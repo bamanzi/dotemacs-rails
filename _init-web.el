@@ -32,5 +32,15 @@
 
 ;;*** js2-mode
 ;;this fork is maintained actively: https://github.com/mooz/js2-mode
-;;https://github.com/mooz/js2-mode/tree/emacs23
+;;here we use the emacs-23 branch: https://github.com/mooz/js2-mode/tree/emacs23
+
+(autoload 'js2-mode  "js2-mode"
+  "Major mode for editing JavaScript code." t)
+
+;;(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+(eval-after-load 'js2-mode
+  '(progn
+     (if (require 'js2-imenu-extras nil t)
+	 (js2-imenu-extras-setup))))
 
