@@ -1,7 +1,7 @@
 ;;* ruby
 ;;** code folding
 (defun bmz/ruby-mode-init-folding ()
-  (setq outline-regexp " *\\(def \\|class\\|module\\)")
+  (setq outline-regexp " *\\(def \\|do \\| do\\|if \\|unless \\|class \\|module \\)")
 
   (require 'hideshow)
   (add-to-list 'hs-special-modes-alist
@@ -26,9 +26,12 @@
 (autoload 'inf-ruby-keys "inf-ruby"
   "Set local key defs for inf-ruby in ruby-mode")
 (add-hook 'ruby-mode-hook
-          '(lambda ()
-             (inf-ruby-keys)
-         ))
+          '(when (require 'inf-ruby nil t)
+             (if (fboundp 'inf-ruby-keys)
+                 (inf-ruby-keys)
+               (if (fboundp 'inf-ruby-setup-keybindings)
+                   (inf-ruby-setup-keybindings))))
+          )
 
 
 ;;** robe: Code navigation, documentation lookup and completion for Ruby
@@ -44,8 +47,15 @@
   (interactive)
   (add-to-list 'ac-sources 'ac-source-robe))
 
+(eval-after-load "robe"
+  `(progn
+     (define-key robe-mode-map (kbd "M-.") nil)
+     (define-key robe-mode-map (kbd "C-c .") 'robe-jump)
+     ))
+
 (eval-after-load "ruby-mode"
   `(progn
+     
      (when (and (require 'auto-complete nil t) 
 		(require 'robe-ac nil t))
 	 (add-hook 'ruby-mode-hook 'ruby-mode-enable-ac))))
@@ -87,3 +97,12 @@
 (eval-after-load "ruby-mode"
   `(progn
      (require 'ruby-tools nil t)))
+
+;;*** speedbar
+(eval-after-load "speedbar"
+  `(progn
+     (speedbar-add-supported-extension ".rb")
+     (speedbar-add-supported-extension ".erb")
+     (speedbar-add-supported-extension ".yml")
+     (speedbar-add-supported-extension ".rake")
+     ))
