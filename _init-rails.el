@@ -34,3 +34,15 @@
   "Simple mode to edit YAML." t)
 
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
+;;** anything-rails
+(defun anything-rails-files ()
+  "Find file in rails project."
+  (interactive)
+  (anything-other-buffer '(anything-c-source-rails-project-files)))
+
+(autoload 'rake "anything-rails"
+  "Uses Anything to show and execute rake tasks" t)
+
+(defalias 'anything-rake-tasks 'rake)
+
