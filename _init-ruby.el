@@ -26,12 +26,13 @@
 (autoload 'inf-ruby-keys "inf-ruby"
   "Set local key defs for inf-ruby in ruby-mode")
 (add-hook 'ruby-mode-hook
-          '(when (require 'inf-ruby nil t)
-             (if (fboundp 'inf-ruby-keys)
-                 (inf-ruby-keys)
+          `(progn
+             (when (require 'inf-ruby nil t)
                (if (fboundp 'inf-ruby-setup-keybindings)
-                   (inf-ruby-setup-keybindings))))
-          )
+                   (inf-ruby-setup-keybindings)
+                 (if (fboundp 'inf-ruby-keys) ;;older version of inf-ruby
+                     (inf-ruby-keys))))
+          ))
 
 
 ;;** robe: Code navigation, documentation lookup and completion for Ruby
