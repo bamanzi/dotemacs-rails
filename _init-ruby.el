@@ -1,4 +1,20 @@
 ;;* ruby
+;;** major mode
+(autoload 'enh-ruby-mode  "enh-ruby-mode"
+  "Enhanced Major mode for editing Ruby code." t)
+
+(eval-after-load "enh-ruby-mode"
+  `(progn
+     ;; copy all hooks
+     (mapc #'(lambda (func)
+               (add-hook 'enh-ruby-mode-hook func))
+           ruby-mode-hook)
+
+     ;; file associations
+     (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+     (add-to-list 'auto-mode-alist '("\\.rake$" . enh-ruby-mode))
+     ))
+
 ;;** code folding
 (defun bmz/ruby-mode-init-folding ()
   (setq outline-regexp " *\\(def \\|do \\| do\\|if \\|unless \\|class \\|module \\)")
