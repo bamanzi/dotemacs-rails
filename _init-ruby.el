@@ -16,23 +16,23 @@
      ))
 
 ;;** code folding
-(defun bmz/ruby-mode-init-folding ()
-  (setq outline-regexp " *\\(def \\|do \\| do\\|if \\|unless \\|class \\|module \\)")
-
-  (require 'hideshow)
-  (add-to-list 'hs-special-modes-alist
-               '(ruby-mode
-                 "\\(def\\|do\\)"
-                 "end"
-                 "#"
-                 (lambda (arg) (ruby-end-of-block))
-                 nil
-                 ))
-  )
-
 (eval-after-load "ruby-mode"
   `(progn
-     (add-hook 'ruby-mode-hook 'bmz/ruby-mode-init-folding)
+     (add-hook 'ruby-mode-hook
+               #'(lambda ()
+                   (setq outline-regexp " *\\(def \\|class \\|module \\)")
+                   ))
+
+     (require 'hideshow)
+     (add-to-list 'hs-special-modes-alist
+                  '(ruby-mode
+                    "\\(def \\|class \\|module \\)"
+                    "end"
+                    "#"
+                    (lambda (arg) (ruby-end-of-block))
+                    nil
+                    ))
+     
      ))
 
 
