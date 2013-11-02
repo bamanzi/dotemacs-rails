@@ -123,3 +123,7 @@
      (speedbar-add-supported-extension ".yml")
      (speedbar-add-supported-extension ".rake")
      ))
+
+;;*** rubocop
+(autoload 'rubocop-check-current-file "rubocop"
+  "Run on current file." t)
