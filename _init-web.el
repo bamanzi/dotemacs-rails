@@ -44,3 +44,7 @@
      (if (require 'js2-imenu-extras nil t)
 	 (js2-imenu-extras-setup))))
 
+
+;;** css
+(autoload 'rainbow-mode "rainbow-mode"
+  "Colorize strings that represent colors." t)
