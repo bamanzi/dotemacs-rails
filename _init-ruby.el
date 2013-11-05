@@ -41,14 +41,16 @@
   "Run an inferior Ruby process")
 (autoload 'inf-ruby-keys "inf-ruby"
   "Set local key defs for inf-ruby in ruby-mode")
-(add-hook 'ruby-mode-hook
-          `(progn
-             (when (require 'inf-ruby nil t)
-               (if (fboundp 'inf-ruby-setup-keybindings)
-                   (inf-ruby-setup-keybindings)
-                 (if (fboundp 'inf-ruby-keys) ;;older version of inf-ruby
-                     (inf-ruby-keys))))
-          ))
+
+
+(defun ruby-mode-init-inf-ruby ()
+  (when (require 'inf-ruby nil t)
+    (if (fboundp 'inf-ruby-setup-keybindings)
+	(inf-ruby-setup-keybindings)
+      (if (fboundp 'inf-ruby-keys) ;;older version of inf-ruby
+	  (inf-ruby-keys)))))
+
+(add-hook 'ruby-mode-hook 'ruby-mode-init-inf-ruby)
 
 
 ;;** robe: Code navigation, documentation lookup and completion for Ruby
