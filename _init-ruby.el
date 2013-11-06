@@ -77,7 +77,8 @@
      
      (when (and (require 'auto-complete nil t) 
 		(require 'robe-ac nil t))
-	 (add-hook 'ruby-mode-hook 'ruby-mode-enable-ac))))
+	 ;;(add-hook 'ruby-mode-hook 'ruby-mode-enable-ac)
+       )))
 
 ;;*** zossima: a lightweight robe
 ;;(actually, robe was forked from zossima)
@@ -129,3 +130,10 @@
 ;;*** rubocop
 (autoload 'rubocop-check-current-file "rubocop"
   "Run on current file." t)
+
+;;*** which-func
+(eval-after-load "which-func"
+  `(progn
+     (add-to-list 'which-func-modes 'ruby-mode)
+     (add-to-list 'which-func-modes 'enh-ruby-mode)
+     ))
