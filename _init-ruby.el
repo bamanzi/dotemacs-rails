@@ -76,8 +76,9 @@
   `(progn
      
      (when (and (require 'auto-complete nil t) 
-		(require 'robe-ac nil t))
-	 ;;(add-hook 'ruby-mode-hook 'ruby-mode-enable-ac)
+                (require 'robe-ac nil t))
+       ;;(add-hook 'ruby-mode-hook 'ruby-mode-enable-ac)
+       (message "By default `ac-source-robe' disabled in ruby-mode, call `ruby-mode-enable-ac' to enable it.")
        )))
 
 ;;*** zossima: a lightweight robe

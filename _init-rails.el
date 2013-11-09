@@ -29,6 +29,12 @@
   `(progn
      (add-hook 'yaml-mode-hook 'rinari-launch)))
 
+
+(eval-after-load "rinari"
+  `(progn
+     (define-key rinari-minor-mode-map (kbd "C-c .") 'robe-jump)
+     ))
+
 ;;** yaml-mode
 (autoload 'yaml-mode  "yaml-mode"
   "Simple mode to edit YAML." t)
