@@ -1,13 +1,13 @@
 ;;; robe.el --- Code navigation, documentation lookup and completion for Ruby
 
 ;; Copyright © 2012 Phil Hagelberg
-;; Copyright © 2012 Dmitry Gutov
+;; Copyright © 2012, 2013 Dmitry Gutov
 
 ;; Author: Dmitry Gutov
 ;; URL: https://github.com/dgutov/robe
-;; Version: 0.7
+;; Version: 0.7.7
 ;; Keywords: ruby convenience rails
-;; Package-Requires: ((inf-ruby "2.2.4"))
+;; Package-Requires: ((inf-ruby "2.3.0"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -27,8 +27,6 @@
 ;;  - C-c C-d to see the documentation
 ;;  - C-c C-k to refresh Rails environment
 ;;  - C-M-i to complete the symbol at point
-;;
-;; Before using any of these commands, call `run-ruby' or `rinari-console'.
 
 ;;; License:
 
@@ -60,6 +58,21 @@
 (require 'eldoc)
 (require 'help-mode)
 (require 'ruby-mode)
+(require 'ansi-color)
+
+(defgroup robe nil
+  "Code navigation, documentation lookup and completion for Ruby"
+  :group 'languages
+  :group 'convenience)
+
+(defcustom robe-highlight-capf-candidates (version< "24.3.50" emacs-version)
+  "When non-nil, `completion-at-point' candidates buffer will
+have constants, methods and arguments highlighted in color."
+  :group 'robe)
+
+(defcustom robe-turn-on-eldoc t
+  "When non-nil, `robe-mode' will turn on `eldoc-mode'."
+  :group 'robe)
 
 (defvar robe-ruby-path
   (let ((current (or load-file-name (buffer-file-name))))
@@ -68,28 +81,63 @@
 
 (defvar robe-port 24969)
 
-(defvar robe-max-retries 4)
-
 (defvar robe-jump-conservative nil)
 
 (defvar robe-running nil)
 
+(defcustom robe-completing-read-func 'ido-completing-read
+  "Function to call for completing read."
+  :type '(choice (const :tag "Ido" ido-completing-read)
+                 (const :tag "Plain" completing-read)
+                 (function :tag "Other function"))
+  :group 'robe)
+
+(defun robe-completing-read (&rest args)
+  (apply robe-completing-read-func args))
+
 (defun robe-start (&optional arg)
   "Start Robe server if it isn't already running."
   (interactive "p")
+  (when (not (get-buffer-process inf-ruby-buffer))
+    (setq robe-running nil)
+    (if (yes-or-no-p "No Ruby console running. Launch automatically?")
+        (let ((conf (current-window-configuration)))
+          (inf-ruby-console-auto)
+          (set-window-configuration conf))
+      (error "Aborted")))
   (when (or arg (not robe-running))
-    (let ((script (format (mapconcat #'identity
-                                     '("unless defined? Robe"
-                                       "  $:.unshift '%s'"
-                                       "  require 'robe'"
-                                       "end"
-                                       "Robe.start(%d)\n")
-                                     ";")
-                          robe-ruby-path robe-port)))
-      (comint-send-string (inf-ruby-proc) script))
-    (if (robe-request "ping")
-        (setq robe-running t)
-      (error "Server doesn't respond"))))
+    (let* ((proc (inf-ruby-proc))
+           started failed
+           (comint-filter (process-filter proc))
+           (tmp-filter (lambda (p s)
+                         (cond
+                          ((string-match-p "\"robe on\""
+                                           (ansi-color-filter-apply s))
+                           (setq started t))
+                          ((string-match-p "Error" s)
+                           (setq failed t)))
+                         (funcall comint-filter p s)))
+           (script (format (mapconcat #'identity
+                                      '("unless defined? Robe"
+                                        "  $:.unshift '%s'"
+                                        "  require 'robe'"
+                                        "end"
+                                        "Robe.start(%d)\n")
+                                      ";")
+                           robe-ruby-path robe-port)))
+      (unwind-protect
+          (progn
+            (set-process-filter proc tmp-filter)
+            (comint-send-string proc script)
+            (while (not started)
+              (unless (process-live-p proc) (setq failed t))
+              (when failed
+                (ruby-switch-to-inf t)
+                (error "Robe launch failed"))
+              (accept-process-output proc)))
+        (set-process-filter proc comint-filter)))
+    (when (robe-request "ping") ;; Should be always t when no error, though.
+      (setq robe-running t))))
 
 (defun robe-request (endpoint &rest args)
   (declare (special url-http-end-of-headers))
@@ -100,25 +148,25 @@
                                           (url-hexify-string arg))
                                          (t "-")))
                                  args "/")))
-         (response-buffer (robe-retrieve url))
-         (value (with-current-buffer response-buffer
-                  (goto-char url-http-end-of-headers)
-                  (let ((json-array-type 'list))
-                    (json-read)))))
-    (kill-buffer response-buffer)
-    value))
+         (response-buffer (robe-retrieve url)))
+    (if response-buffer
+        (prog1
+            (with-current-buffer response-buffer
+              (goto-char url-http-end-of-headers)
+              (let ((json-array-type 'list))
+                (json-read)))
+          (kill-buffer response-buffer))
+      (error "Server doesn't respond"))))
 
-(defun robe-retrieve (url &optional retries)
+(defun robe-retrieve (url)
   (declare (special url-http-response-status))
-  (with-current-buffer (url-retrieve-synchronously url)
-    (unless (memq url-http-response-status '(200 500))
-      (if (and retries (not (plusp retries)))
-          (setq robe-running nil)
-        (kill-buffer)
-        (sleep-for 0.3)
-        (set-buffer
-         (robe-retrieve url (1- (or retries robe-max-retries))))))
-    (current-buffer)))
+  (let ((buffer (condition-case nil (url-retrieve-synchronously url)
+                  (file-error nil))))
+    (if (and buffer
+             (with-current-buffer buffer
+               (memq url-http-response-status '(200 500))))
+        buffer
+      (setq robe-running nil))))
 
 (defstruct (robe-spec (:type list)) module inst-p method params file line)
 
@@ -129,11 +177,11 @@
 
 (defun robe-ask-prompt ()
   (let* ((modules (robe-request "modules"))
-         (module (ido-completing-read "Module: " modules))
+         (module (robe-completing-read "Module: " modules))
          (targets (robe-request "targets" module))
          (_ (unless targets (error "No methods found")))
          (alist (robe-decorate-methods (cdr targets))))
-    (cdr (assoc (ido-completing-read "Method: " alist nil t)
+    (cdr (assoc (robe-completing-read "Method: " alist nil t)
                 alist))))
 
 (defun robe-decorate-methods (list)
@@ -165,7 +213,7 @@ If invoked with a prefix or no symbol at point, delegate to `robe-ask'."
     (unless alist (error "Method not found"))
     (if (= 1 (length alist))
         (cdar alist)
-      (cdr (assoc (ido-completing-read "Module: " alist nil t)
+      (cdr (assoc (robe-completing-read "Module: " alist nil t)
                   alist)))))
 
 (defun robe-jump-modules (thing)
@@ -191,9 +239,11 @@ If invoked with a prefix or no symbol at point, delegate to `robe-ask'."
 (defun robe-call-context ()
   (let* ((target (save-excursion
                    (and (progn (ignore-errors (beginning-of-thing 'symbol))
-                               (= ?. (char-before)))
+                               (eq ?. (char-before)))
                         (progn (forward-char -1)
-                               (thing-at-point 'symbol)))))
+                               (skip-chars-backward " \n\r\t")
+                               (or (thing-at-point 'symbol)
+                                   "!")))))
          (ctx (robe-context))
          (module (first ctx))
          (_ (when (string= target "self") (setq target nil)))
@@ -213,13 +263,13 @@ If invoked with a prefix or no symbol at point, delegate to `robe-ask'."
 
 (defun robe-jump-to-module (name)
   "Prompt for module, jump to a file where it has method definitions."
-  (interactive `(,(ido-completing-read "Module: " (robe-request "modules"))))
+  (interactive `(,(robe-completing-read "Module: " (robe-request "modules"))))
   (let ((paths (robe-request "class_locations" name (car (robe-context)))))
     (when (null paths) (error "Can't find the location"))
     (let ((file (if (= (length paths) 1)
                     (car paths)
                   (let ((alist (robe-to-abbr-paths paths)))
-                    (cdr (assoc (ido-completing-read "File: " alist nil t)
+                    (cdr (assoc (robe-completing-read "File: " alist nil t)
                                 alist))))))
       (robe-find-file file)
       (goto-char (point-min))
@@ -405,7 +455,9 @@ Only works with Rails, see e.g. `rinari-console'."
 (defun robe-doc-fontify-c-string (string)
   (with-temp-buffer
     (insert string)
-    (c-mode)
+    (let ((delay-mode-hooks t))
+      (c-mode))
+    (run-hooks 'font-lock-mode-hook)
     (font-lock-fontify-buffer)
     (buffer-string)))
 
@@ -517,55 +569,58 @@ Only works with Rails, see e.g. `rinari-console'."
       n)))
 
 (defun robe-eldoc ()
-  (save-excursion
-    (let* ((call (robe-call-at-point))
-           (thing (car call))
-           (arg-num (cdr call))
-           (url-show-status nil)
-           (robe-max-retries 0))
-      (when (and thing robe-running (not (robe-const-p thing)))
-        (let* ((robe-jump-conservative t)
-               (list (loop for spec in (robe-jump-modules thing)
-                           when (robe-spec-module spec) collect spec)))
-          (when (consp list)
-            (let* ((spec (car list))
-                   (doc (robe-doc-for spec))
-                   (summary (with-temp-buffer
-                              (insert (cdr (assoc 'docstring doc)))
-                              (unless (= (point) (point-min))
-                                (goto-char (point-min))
-                                (save-excursion
-                                  (forward-sentence)
-                                  (delete-region (point) (point-max)))
-                                (robe-doc-apply-rules (point) (point-max))
-                                (while (search-forward "\n" nil t)
-                                  (replace-match " ")))
-                              (buffer-string)))
-                   (sig (robe-signature spec arg-num))
-                   (msg (format "%s %s" sig summary)))
-              (substring msg 0 (min (frame-width) (length msg))))))))))
+  (when robe-running
+    (save-excursion
+      (let* ((call (robe-call-at-point))
+             (thing (car call))
+             (arg-num (cdr call))
+             (url-show-status nil))
+        (when (and thing (not (robe-const-p thing)))
+          (let* ((robe-jump-conservative t)
+                 (list (loop for spec in (robe-jump-modules thing)
+                             when (robe-spec-module spec) collect spec)))
+            (when (consp list)
+              (let* ((spec (car list))
+                     (doc (robe-doc-for spec))
+                     (summary (with-temp-buffer
+                                (insert (cdr (assoc 'docstring doc)))
+                                (unless (= (point) (point-min))
+                                  (goto-char (point-min))
+                                  (save-excursion
+                                    (forward-sentence)
+                                    (delete-region (point) (point-max)))
+                                  (robe-doc-apply-rules (point) (point-max))
+                                  (while (search-forward "\n" nil t)
+                                    (replace-match " ")))
+                                (buffer-string)))
+                     (sig (robe-signature spec arg-num))
+                     (msg (format "%s %s" sig summary)))
+                (substring msg 0 (min (frame-width) (length msg)))))))))))
 
 (defun robe-complete-at-point ()
-  (let ((bounds (bounds-of-thing-at-point 'symbol))
-        (fn (completion-table-dynamic #'robe-complete-thing)))
-    (if bounds
-        (list (car bounds) (cdr bounds) fn
-              :annotation-function #'robe-complete-annotation
-              :exit-function #'robe-complete-exit)
-      (list (point) (point) fn))))
+  (when (get-buffer-process inf-ruby-buffer)
+    (let ((bounds (bounds-of-thing-at-point 'symbol))
+          (fn (if (fboundp 'completion-table-with-cache)
+                  (completion-table-with-cache #'robe-complete-thing)
+                (completion-table-dynamic #'robe-complete-thing))))
+      (if bounds
+          (list (car bounds) (cdr bounds) fn
+                :annotation-function #'robe-complete-annotation
+                :exit-function #'robe-complete-exit)
+        (list (point) (point) fn)))))
 
 (defvar robe-specs-cache nil)
 
-(defmacro robe-with-cached-spec (method &rest body)
-  (declare (indent 1) (debug t))
-  `(when robe-specs-cache
-     (let ((spec (gethash ,method robe-specs-cache)))
-       (when spec
-         ,@body))))
+(defun robe-cached-specs (method)
+  (when robe-specs-cache
+    (gethash method robe-specs-cache)))
 
 (defun robe-complete-annotation (thing)
-  (robe-with-cached-spec thing
-    (robe-signature-params (robe-spec-params spec))))
+  (let ((params (robe-signature-params (robe-spec-params
+                                        (car (robe-cached-specs thing))))))
+    (if robe-highlight-capf-candidates
+        params
+      (substring-no-properties params))))
 
 (defun robe-complete-exit (&rest _)
   (setq robe-specs-cache nil))
@@ -580,9 +635,16 @@ Only works with Rails, see e.g. `rinari-console'."
     (destructuring-bind (target module instance _) (robe-call-context)
       (setq robe-specs-cache (make-hash-table :test 'equal))
       (mapcar (lambda (spec)
-                (let ((method (robe-spec-method spec)))
-                  (puthash method spec robe-specs-cache)
-                  method))
+                (let* ((method (robe-spec-method spec))
+                       (value (gethash method robe-specs-cache))
+                       case-fold-search)
+                  (puthash method (cons spec value) robe-specs-cache)
+                  (if robe-highlight-capf-candidates
+                      (propertize method 'face
+                                  (if (string-match "\\`[A-Z]" method)
+                                      'font-lock-type-face
+                                    'font-lock-function-name-face))
+                    method)))
               (reverse
                (robe-request "complete_method" thing target module instance))))))
 
@@ -596,12 +658,17 @@ Only works with Rails, see e.g. `rinari-console'."
 
 ;;;###autoload
 (define-minor-mode robe-mode
-  "Improved navigation for Ruby"
+  "Improved navigation for Ruby.
+
+The following commands are available:
+
+\\{robe-mode-map}"
   nil " robe" robe-mode-map
-  (add-to-list 'completion-at-point-functions 'robe-complete-at-point)
-  (set (make-local-variable 'eldoc-documentation-function) 'robe-eldoc)
-  (eldoc-add-command 'robe-complete-thing)
-  (turn-on-eldoc-mode))
+  (add-hook 'completion-at-point-functions 'robe-complete-at-point nil t)
+  (when robe-turn-on-eldoc
+    (set (make-local-variable 'eldoc-documentation-function) 'robe-eldoc)
+    (eldoc-add-command 'robe-complete-thing)
+    (turn-on-eldoc-mode)))
 
 (provide 'robe)
 ;;; robe.el ends here

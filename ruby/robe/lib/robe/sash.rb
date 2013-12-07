@@ -1,13 +1,14 @@
+require 'robe/sash/doc_for'
 require 'robe/type_space'
 require 'robe/scanners'
 require 'robe/visor'
-require 'robe/sash/doc_for'
+require 'robe/jvisor'
 
 module Robe
   class Sash
     attr_accessor :visor
 
-    def initialize(visor = Visor.new)
+    def initialize(visor = pick_visor)
       @visor = visor
     end
 
@@ -15,7 +16,7 @@ module Robe
       locations = {}
       if (obj = visor.resolve_context(name, mod)) and obj.is_a? Module
         methods = obj.methods(false).map { |m| obj.method(m) } +
-          obj.instance_methods(false).map { |m| obj.instance_method(m) }
+                  obj.instance_methods(false).map { |m| obj.instance_method(m) }
         methods.each do |m|
           if loc = m.source_location
             path = loc[0]
@@ -31,7 +32,9 @@ module Robe
     end
 
     def modules
-      visor.each_object(Module).map { |c| c.name }.tap { |ms| ms.compact! }
+      res = visor.each_object(Module).map { |c| c.name rescue nil }
+      res.compact!
+      res
     end
 
     def targets(obj)
@@ -48,7 +51,7 @@ module Robe
     end
 
     def find_method(mod, inst, sym)
-      mod.send(inst ? :instance_method : :method, sym)
+      mod.__send__(inst ? :instance_method : :method, sym)
     end
 
     def find_method_owner(mod, inst, sym)
@@ -64,7 +67,7 @@ module Robe
         inst = true
         name = method_owner_name(owner)
       else
-        name = owner.to_s[/Class:(.*)>\Z/, 1] # defined in an eigenclass
+        name = owner.to_s[/Class:([A-Z][^\(>]*)/, 1] # defined in an eigenclass
       end
       [name, inst, method.name, method.parameters] + method.source_location.to_a
     end
@@ -151,12 +154,29 @@ module Robe
     end
 
     def rails_refresh
-      reload!
+      ActionDispatch::Reloader.cleanup!
+      ActionDispatch::Reloader.prepare!
       Rails.application.eager_load!
     end
 
     def ping
-      true
+      "pong"
+    end
+
+    def call(path, body)
+      _, endpoint, *args = path.split("/").map { |s| s == "-" ? nil : s }
+      value = public_send(endpoint.to_sym, *args)
+      value.to_json
+    end
+
+    private
+
+    def pick_visor
+      if RUBY_ENGINE == "jruby"
+        JVisor.new
+      else
+        Visor.new
+      end
     end
   end
 end

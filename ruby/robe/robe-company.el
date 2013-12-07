@@ -8,18 +8,30 @@
     (interactive (company-begin-backend 'company-robe))
     (prefix (and (boundp 'robe-mode)
                  robe-mode robe-running
-                 (or (thing-at-point 'symbol)
-                     "")))
+                 (company-grab-symbol)))
     (candidates (robe-complete-thing arg))
     (duplicates t)
-    (meta (robe-with-cached-spec arg
-            (robe-signature spec)))
-    (location (robe-with-cached-spec arg
+    (meta (let ((spec (car (robe-cached-specs arg))))
+            (when spec (robe-signature spec))))
+    (location (let ((spec (company-robe-choose-spec arg)))
                 (cons (robe-spec-file spec)
                       (robe-spec-line spec))))
-    (doc-buffer (robe-with-cached-spec arg
-                  (save-window-excursion
-                    (robe-show-doc spec)
-                    (get-buffer "*robe-doc*"))))))
+    (doc-buffer (let ((spec (company-robe-choose-spec arg)))
+                  (when spec
+                    (save-window-excursion
+                      (robe-show-doc spec)
+                      (message nil)
+                      (get-buffer "*robe-doc*")))))))
+
+(defun company-robe-choose-spec (thing)
+  (let ((specs (robe-cached-specs thing)))
+    (when specs
+      (if (cdr specs)
+          (let ((alist (loop for spec in specs
+                             for module = (robe-spec-module spec)
+                             when module
+                             collect (cons module spec))))
+            (cdr (assoc (ido-completing-read "Module: " alist nil t) alist)))
+        (car specs)))))
 
 (provide 'robe-company)

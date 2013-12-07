@@ -1,5 +1,5 @@
-require 'robe/server'
 require 'robe/sash'
+require 'robe/server'
 
 module Robe
   class << self
@@ -7,12 +7,20 @@ module Robe
 
     def start(port)
       return if @server
-      @server = Server.new(port, Sash.new)
+      @server = Server.new(Sash.new, port)
       ['INT', 'TERM'].each do |signal|
         trap(signal) { stop }
       end
-      Thread.new { @server.start }
-      nil # no output
+      Thread.new do
+        unless Thread.current[:__yard_registry__]
+          Thread.current[:__yard_registry__] = Thread.main[:__yard_registry__]
+        end
+        @server.start
+      end
+
+      @server.wait_for_it
+
+      "robe on"
     end
 
     def stop

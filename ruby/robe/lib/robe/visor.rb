@@ -6,6 +6,10 @@ module Robe
 
     delegate each_object: ObjectSpace
 
+    def descendants(cls)
+      each_object(cls.singleton_class).to_a - [cls]
+    end
+
     def resolve_context(name, mod)
       return resolve_const(mod) unless name
       unless name =~ /\A::/
@@ -27,21 +31,24 @@ module Robe
     def resolve_path(name)
       return [] unless name
       return [ARGF.class] if name == "ARGF.class"
+      if %w(IO::readable IO::writable).include?(name)
+        return [StringIO.included_modules.find { |m| m.name == name }]
+      end
       nesting = name.split("::")
       nesting.shift if nesting[0].empty?
-      begin
-        resolve_path_elems(nesting)
-      rescue NameError
-        []
-      end
+      resolve_path_elems(nesting)
     end
 
     def resolve_path_elems(nesting, init = Object)
       c = init; ary = []
-      nesting.each do |name|
-        ary << (c = c.const_get(name))
+      begin
+        nesting.each do |name|
+          ary << (c = c.const_get(name))
+        end
+        ary
+      rescue NameError
+        []
       end
-      ary
     end
   end
 end
