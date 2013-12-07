@@ -5,10 +5,10 @@
 ;;   Geoff Jacobsen
 
 ;; Author: Geoff Jacobsen
-;; URL: http://http://github.com/zenspider/Enhanced-Ruby-Mode
+;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages elisp, ruby
-;; Version: 1.0
+;; Version: 1.0.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -42,10 +42,9 @@
 ;;
 ;;    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
 ;;    (setq enh-ruby-program "(path-to-ruby1.9)/bin/ruby") ; so that still works if ruby points to ruby1.8
-;;    (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
-;;    (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
-;;    (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 ;;
+
+(require 'cl) ; for cdddr, caddr
 
 ;;; Variables:
 
@@ -84,7 +83,7 @@ the value changes.
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-indent-level 'safe-local-variable 'integerp)
 
-(defcustom enh-ruby-hanging-indent-level 1
+(defcustom enh-ruby-hanging-indent-level 2
   "*Extra hanging Indentation for continued ruby statements."
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-hanging-indent-level 'safe-local-variable 'integerp)
@@ -107,6 +106,31 @@ the value changes.
 (defcustom enh-ruby-deep-indent-paren-style nil
   "Ignored in enhanced ruby mode."
   :options '(t nil space) :group 'enh-ruby)
+
+(defcustom enh-ruby-bounce-deep-indent nil
+  "Bounce between normal indentation and deep indentation when non-nil."
+  :group 'enh-ruby)
+(put 'enh-ruby-bounce-deep-indent 'safe-local-variable 'booleanp)
+
+(defcustom enh-ruby-hanging-paren-indent-level 2
+  "*Extra hanging indentation for continued ruby parenthesis."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-paren-indent-level 'safe-local-variable 'integerp)
+
+(defcustom enh-ruby-hanging-brace-indent-level 2
+  "*Extra hanging indentation for continued ruby curly braces."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-brace-indent-level 'safe-local-variable 'integerp)
+
+(defcustom enh-ruby-hanging-paren-deep-indent-level 0
+  "*Extra hanging deep indentation for continued ruby parenthesis."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-paren-deep-indent-level 'safe-local-variable 'integerp)
+
+(defcustom enh-ruby-hanging-brace-deep-indent-level 0
+  "*Extra hanging deep indentation for continued ruby curly braces."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-brace-deep-indent-level 'safe-local-variable 'integerp)
 
 (defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
   "Alist to map encoding name from emacs to ruby."
@@ -135,42 +159,49 @@ the value changes.
                                          "+\\)")
   "Regexp to match definitions and their name")
 
+
+(defconst erm-process-delimiter
+  "\n\0\0\0\n")
+
 ;;; Faces:
 
-(require 'color)
+(require 'color nil t)
 
 (defun erm-darken-color (name)
   (color-darken-name (face-attribute name :foreground) 20))
 
-(defface enh-ruby-string-delimiter-face
-  `((t :foreground ,(erm-darken-color font-lock-string-face)))
-  "Face used to highlight string delimiters like \" and %Q."
-  :group 'enh-ruby)
+(defun erm-define-faces ()
+ (defface enh-ruby-string-delimiter-face
+   `((t :foreground ,(erm-darken-color font-lock-string-face)))
+   "Face used to highlight string delimiters like \" and %Q."
+   :group 'enh-ruby)
 
-(defface enh-ruby-heredoc-delimiter-face
-  `((t :foreground ,(erm-darken-color font-lock-string-face)))
-  "Face used to highlight string heredoc anchor strings like <<END and END"
-  :group 'enh-ruby)
+ (defface enh-ruby-heredoc-delimiter-face
+   `((t :foreground ,(erm-darken-color font-lock-string-face)))
+   "Face used to highlight string heredoc anchor strings like <<END and END"
+   :group 'enh-ruby)
 
-(defface enh-ruby-regexp-delimiter-face
-  `((t :foreground ,(erm-darken-color font-lock-string-face)))
-  "Face used to highlight regexp delimiters like / and %r."
-  :group 'enh-ruby)
+ (defface enh-ruby-regexp-delimiter-face
+   `((t :foreground ,(erm-darken-color font-lock-string-face)))
+   "Face used to highlight regexp delimiters like / and %r."
+   :group 'enh-ruby)
 
-(defface enh-ruby-op-face
-  `((t :foreground ,(erm-darken-color font-lock-keyword-face)))
-  "Face used to highlight operators like + and ||"
-  :group 'enh-ruby)
+ (defface enh-ruby-op-face
+   `((t :foreground ,(erm-darken-color font-lock-keyword-face)))
+   "Face used to highlight operators like + and ||"
+   :group 'enh-ruby)
 
-(defface erm-syn-errline
-  '((t (:box (:line-width 1 :color "red"))))
-  "Face used for marking error lines."
-  :group 'enh-ruby)
+ (defface erm-syn-errline
+   '((t (:box (:line-width 1 :color "red"))))
+   "Face used for marking error lines."
+   :group 'enh-ruby)
 
-(defface erm-syn-warnline
-  '((t (:box (:line-width 1 :color "orange"))))
-  "Face used for marking warning lines."
-  :group 'enh-ruby)
+ (defface erm-syn-warnline
+   '((t (:box (:line-width 1 :color "orange"))))
+   "Face used for marking warning lines."
+   :group 'enh-ruby))
+
+(add-hook 'enh-ruby-mode-hook 'erm-define-faces)
 
 ;;; Functions:
 
@@ -228,7 +259,8 @@ the value changes.
       (set-process-query-on-exit-flag erm-ruby-process nil)
       (process-send-string (erm-ruby-get-process) (concat "x0:"
                                                           (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
-                                                          ":\n\0\0\0\n"))))
+                                                          ":"
+                                                          erm-process-delimiter))))
 
   erm-ruby-process)
 
@@ -277,10 +309,14 @@ the value changes.
         (erm-reset-buffer)))))
 
 (defun erm-major-mode-changed ()
+  (remove-hook 'kill-buffer-hook 'erm-buffer-killed t)
   (erm-buffer-killed))
 
+(defun erm-proc-string (prefix)
+  (concat prefix (number-to-string erm-buff-num) ":" erm-process-delimiter))
+
 (defun erm-buffer-killed ()
-  (process-send-string (erm-ruby-get-process) (concat "k" (number-to-string erm-buff-num) ":\n\0\0\0\n")))
+  (process-send-string (erm-ruby-get-process) (erm-proc-string "k")))
 
 (defun erm-reset-buffer ()
   (setq erm-buff-num erm-next-buff-num)
@@ -298,7 +334,7 @@ the value changes.
                            (concat "x"
                                    (number-to-string erm-buff-num) ":"
                                    (mapconcat 'identity enh-ruby-extra-keywords " ")
-                                   ":\n\0\0\0\n"))
+                                   ":" erm-process-delimiter))
       (enh-ruby-fontify-buffer)
       t))
 
@@ -360,13 +396,14 @@ the value changes.
   (define-key enh-ruby-mode-map "\e\C-q"   'enh-ruby-indent-exp)
   (define-key enh-ruby-mode-map "\C-c\C-e" 'enh-ruby-find-error)
   (define-key enh-ruby-mode-map "\C-c\C-f" 'enh-ruby-insert-end)
-  (define-key enh-ruby-mode-map "\C-m"     'newline)
   (define-key enh-ruby-mode-map "\C-c/"    'enh-ruby-insert-end))
 
 (defvar enh-ruby-mode-abbrev-table nil
   "Abbrev table in use in enh-ruby-mode buffers.")
 
 (define-abbrev-table 'enh-ruby-mode-abbrev-table ())
+(define-abbrev enh-ruby-mode-abbrev-table "end" "end" 'indent-for-tab-command
+  :system t)
 
 (defun enh-ruby-mode-variables ()
   (make-variable-buffer-local      'enh-ruby-extra-keywords)
@@ -388,6 +425,7 @@ the value changes.
   (set (make-local-variable        'paragraph-separate) paragraph-start)
   (set (make-local-variable        'paragraph-ignore-fill-prefix) t))
 
+;;;###autoload
 (defun enh-ruby-mode ()
   "Enhanced Major mode for editing Ruby code.
 
@@ -401,6 +439,7 @@ the value changes.
         comment-start "#"  ; used by comment-region; don't change it
         comment-end "")
   (enh-ruby-mode-variables)
+  (abbrev-mode)
 
   ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
   ;; for characters inside regexp literals.
@@ -507,9 +546,15 @@ modifications to the buffer."
                 (erm-reparse-diff-buf)
               (setq erm-parse-buff (current-buffer))
               (process-send-string (erm-ruby-get-process)
-                                   (format "%s%d:%d:%d:%d:%d:" pc erm-buff-num (point-min) (point-max) min len))
+                                   (format "%s%d:%d:%d:%d:%d:"
+                                           pc
+                                           erm-buff-num
+                                           (point-min)
+                                           (point-max)
+                                           min
+                                           len))
               (process-send-region erm-ruby-process min max)
-              (process-send-string erm-ruby-process "\n\0\0\0\n"))
+              (process-send-string erm-ruby-process erm-process-delimiter))
             nil))
     (when interrupted-p
       (setq erm-full-parse-p t))))
@@ -520,7 +565,8 @@ modifications to the buffer."
 
 (defun erm-filter (proc response)
   (setq erm-response (concat erm-response response))
-  (when (and (> (length erm-response) 5) (string= "\n\0\0\0\n" (substring erm-response -5 nil)))
+  (when (and (> (length erm-response) 5)
+             (string= erm-process-delimiter (substring erm-response -5 nil)))
     (setq response (substring erm-response 0 -5))
     (setq erm-response "")
     (with-current-buffer erm-parse-buff
@@ -531,7 +577,7 @@ modifications to the buffer."
   (if erm-full-parse-p
       (enh-ruby-fontify-buffer)
     (setq erm-parsing-p t)
-    (process-send-string (erm-ruby-get-process) (concat "g" (number-to-string erm-buff-num) ":\n\0\0\0\n"))))
+    (process-send-string (erm-ruby-get-process) (erm-proc-string "g"))))
 
 (setq enh-ruby-font-names
       '(nil
@@ -571,11 +617,24 @@ modifications to the buffer."
             (enh-ruby-calculate-indent-1 pos (line-beginning-position))))
 
          ((eq 'r prop)
-          (if enh-ruby-deep-indent-paren
-              (progn (enh-ruby-backward-sexp) (current-column))
-            (forward-line -1)
-            (enh-ruby-skip-non-indentable)
-            (- (enh-ruby-calculate-indent-1 pos (line-beginning-position)) enh-ruby-indent-level)))
+          (let ((opening-col
+                 (save-excursion (enh-ruby-backward-sexp) (current-column))))
+            (if (and enh-ruby-deep-indent-paren
+                     (not enh-ruby-bounce-deep-indent))
+                opening-col
+              (forward-line -1)
+              (enh-ruby-skip-non-indentable)
+              (let ((opening-char
+                     (save-excursion (enh-ruby-backward-sexp) (char-after)))
+                    (proposed-col
+                     (enh-ruby-calculate-indent-1 pos
+                                                  (line-beginning-position))))
+                (if (< proposed-col opening-col)
+                    (- proposed-col
+                       (if (char-equal opening-char ?{)
+                           enh-ruby-hanging-brace-indent-level
+                         enh-ruby-hanging-paren-indent-level))
+                     opening-col)))))
 
          ((or (memq face '(font-lock-string-face enh-ruby-heredoc-delimiter-face))
               (and (eq 'font-lock-variable-name-face face)
@@ -607,6 +666,12 @@ modifications to the buffer."
     (skip-chars-backward " \n\t\r\v\f")
     (forward-line 0)))
 
+(defvar enh-ruby-last-bounce-line nil
+  "The last line that `erm-bounce-deep-indent-paren` was run against.")
+
+(defvar enh-ruby-last-bounce-deep nil
+  "The last result from `erm-bounce-deep-indent-paren`.")
+
 (defun enh-ruby-calculate-indent-1 (limit pos)
   (goto-char pos)
   (let ((start-pos pos)
@@ -616,6 +681,12 @@ modifications to the buffer."
         pc (npc 0)
         (prop (get-text-property pos 'indent)))
 
+    (setq enh-ruby-last-bounce-deep
+          (if (eq enh-ruby-last-bounce-line (line-number-at-pos))
+              (not enh-ruby-last-bounce-deep)
+            t))
+    (setq enh-ruby-last-bounce-line (line-number-at-pos))
+
     (while (< pos limit)
       (unless prop
         (setq pos (next-single-property-change pos 'indent (current-buffer) limit))
@@ -623,7 +694,18 @@ modifications to the buffer."
           (setq prop (get-text-property pos 'indent))))
       (setq col (- pos start-pos -1))
       (cond
-       ((eq prop 'l) (setq pc (cons (if enh-ruby-deep-indent-paren col (+ enh-ruby-indent-level indent)) pc)))
+       ((eq prop 'l)
+        (let ((shallow-indent
+               (if (char-equal (char-after pos) ?{)
+                   (+ enh-ruby-hanging-brace-indent-level indent)
+                 (+ enh-ruby-hanging-paren-indent-level indent)))
+              (deep-indent
+               (if (char-equal (char-after pos) ?{)
+                   (+ enh-ruby-hanging-brace-deep-indent-level col)
+                 (+ enh-ruby-hanging-paren-deep-indent-level col))))
+          (if enh-ruby-bounce-deep-indent
+              (setq pc (cons (if enh-ruby-last-bounce-deep shallow-indent deep-indent) pc))
+            (setq pc (cons (if enh-ruby-deep-indent-paren deep-indent shallow-indent) pc)))))
        ((eq prop 'r) (if pc (setq pc (cdr pc)) (setq npc col)))
        ((or (eq prop 'b) (eq prop 'd) (eq prop 's)) (setq bc (cons col bc)))
        ((eq prop 'e) (if bc (setq bc (cdr bc)) (setq nbc col))))
@@ -1038,8 +1120,7 @@ With ARG, do it that many times."
             (when need-syntax-check-p
               (setq need-syntax-check-p nil)
               (setq erm-parsing-p t)
-              (process-send-string (erm-ruby-get-process) (concat "c" (number-to-string erm-buff-num)
-                                                                  ":\n\0\0\0\n"))))
+              (process-send-string (erm-ruby-get-process) (erm-proc-string "c"))))
         (if erm-syntax-check-list
             (erm-do-syntax-check))))))
 
@@ -1081,4 +1162,13 @@ With ARG, do it that many times."
 
 (erm-reset)
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.rb\\'" . enh-ruby-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("Rakefile\\'" . enh-ruby-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.gemspec\\'" . enh-ruby-mode))
+
 (provide 'enh-ruby-mode)
+
+;;; enh-ruby-mode.el ends here

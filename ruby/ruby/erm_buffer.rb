@@ -126,7 +126,8 @@ class ErmBuffer
       add(:rem,tok)
     end
 
-    for sym in [:embexpr_end, :float, :int, :qwords_beg, :words_beg, :words_sep]
+    for sym in [:float, :int, :qwords_beg, :words_beg, :qsymbols_beg,
+                :symbols_beg, :words_sep]
       alias_method "on_#{sym}", :on_backref
     end
 
@@ -160,6 +161,7 @@ class ErmBuffer
     INDENT_KW    = make_hash [:begin, :def, :case, :module, :class, :do]
     BACKDENT_KW  = make_hash [:elsif, :else, :when, :rescue, :ensure]
     BEGINDENT_KW = make_hash [:if, :unless, :while, :until]
+    POSTCOND_KW  = make_hash [:if, :unless, :or, :and]
 
     def on_op(tok)
       if @mode == :sym
@@ -272,8 +274,14 @@ class ErmBuffer
         len=2
       end
       @brace_stack << :embexpr
-      indent(:l,1)
-      add(:ivar,tok,len)
+      indent(:d,1)
+      add(:embexpr_beg,tok,len)
+    end
+
+    def on_embexpr_end(tok)
+      @brace_stack.pop
+      indent(:e)
+      add(:embexpr_beg,tok)
     end
 
     def on_tlambeg(tok)
@@ -329,8 +337,8 @@ class ErmBuffer
     def on_rbrace(tok)
       add(case @brace_stack.pop
           when :embexpr
-            indent(:r)
-            :ivar
+            indent(:e)
+            :embexpr_beg
           when :block
             indent(:e)
             :block
@@ -381,6 +389,7 @@ class ErmBuffer
           r
         end
       else
+        last_add = nil
         if sym == :end
           indent(:e)
         elsif sym == :do
@@ -389,13 +398,19 @@ class ErmBuffer
           @block=:b4args
           return r
         elsif BEGINDENT_KW.include? sym
-          indent(:b) if @statment_start
+          if @statment_start
+            indent(:b)
+          elsif POSTCOND_KW.include? sym
+            last_add = :cont
+          end
+        elsif POSTCOND_KW.include? sym
+          last_add = :cont
         elsif INDENT_KW.include? sym
           indent(:b)
         elsif BACKDENT_KW.include? sym
           indent(:s) if @statment_start
         end
-        r=add(:kw,sym)
+        r=add(:kw,sym,sym.size,false,last_add)
         @mode= (sym==:def || sym==:alias) && :predef
         r
       end
@@ -460,6 +475,8 @@ class ErmBuffer
     arglist:         3,
     cvar:            3,
     gvar:            3,
+    embexpr_beg:     3,
+    embexpr_end:     3,
     comment:         4,  # font-lock-comment-face
     embdoc:          4,
     label:           5,  # font-lock-constant-face
