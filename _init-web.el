@@ -12,6 +12,25 @@
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
   )
 
+;;** multi-web-mode
+(autoload 'multi-web-mode "multi-web-mode"
+  "Enables the multi web mode chunk detection and indentation" t)
+(autoload 'multi-web-global-mode "multi-web-mode"
+  "Toggle Multi-Web mode in every possible buffer." t)
+
+(setq mweb-default-major-mode 'html-mode)
+(setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+                  (js-mode "<script[^>]*>" "</script>")
+                  (css-mode "<style[^>]*>" "</style>")
+                  (ruby-mode "<%" "%>")
+                  ))
+                  
+(setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5" "erb"))
+
+;;NOTE: this is required for `multi-web-mode' to work correctly
+;;(multi-web-global-mode 1)
+
+
 ;;** php-mode
 ;;use this fork: https://github.com/ejmr/php-mode
 (autoload 'php-mode  "php-mode"
