@@ -43,12 +43,17 @@
   "Set local key defs for inf-ruby in ruby-mode")
 
 
-(defun ruby-mode-init-inf-ruby ()
+(defun ruby-mode-init-inf-ruby ()  
   (when (require 'inf-ruby nil t)
-    (if (fboundp 'inf-ruby-setup-keybindings)
-	(inf-ruby-setup-keybindings)
-      (if (fboundp 'inf-ruby-keys) ;;older version of inf-ruby
-	  (inf-ruby-keys)))))
+    (cond
+     ((fboundp 'inf-ruby-minor-mode)
+      (inf-ruby-minor-mode 1))
+     ((fboundp 'inf-ruby-setup-keybindings)
+       (inf-ruby-setup-keybindings))
+     ((fboundp 'inf-ruby-keys) ;;older version of inf-ruby
+	  (inf-ruby-keys))
+     (t
+      (message "how to activate inf-ruby?")))))
 
 (add-hook 'ruby-mode-hook 'ruby-mode-init-inf-ruby)
 
