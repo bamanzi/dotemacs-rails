@@ -16,23 +16,39 @@
      ))
 
 ;;** code folding
-(eval-after-load "ruby-mode"
-  `(progn
-     (add-hook 'ruby-mode-hook
-               #'(lambda ()
-                   (setq outline-regexp " *\\(def \\|class \\|module \\)")
-                   ))
+(defun ruby-mode-init-folding ()
+  (interactive)
 
-     (require 'hideshow)
-     (add-to-list 'hs-special-modes-alist
-                  '(ruby-mode
-                    "\\(def \\|class \\|module \\)"
+  (setq outline-regexp " *\\(def \\|class \\|module \\)")
+
+
+  (require 'hideshow)
+  (let ((settings '("\\<\\(def\\|class\\|module\\|begin\\|do\\)\\>"
                     "end"
                     "#"
                     (lambda (arg) (ruby-end-of-block))
                     nil
-                    ))
-     
+                    )))
+    (if (assoc 'ruby-mode hs-special-modes-alist)
+        (setcdr (assoc 'ruby-mode hs-special-modes-alist) settings)
+      (add-to-list 'hs-special-modes-alist (cons ruby-mode settings))))
+    
+
+  (let ((settings '("\\<\\(def\\|class\\|module\\|begin\\|do\\)\\>"
+                    "end"
+                    "#"
+                    (lambda (arg) (enh-ruby-end-of-block))
+                    nil
+                    )))
+    (if (assoc 'enh-ruby-mode hs-special-modes-alist)
+        (setcdr (assoc 'enh-ruby-mode hs-special-modes-alist) settings)
+      (add-to-list 'hs-special-modes-alist (cons enh-ruby-mode settings))))
+  
+  )
+  
+(eval-after-load "ruby-mode"
+  `(progn
+     (add-hook 'ruby-mode-hook 'ruby-mode-init-folding)
      ))
 
 
