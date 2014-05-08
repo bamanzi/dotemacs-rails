@@ -13,6 +13,9 @@
 (autoload 'rinari-launch "rinari"
   "Call function `rinari-minor-mode' if inside a rails project." t)
 
+(autoload 'rinari-console "rinari"
+  "Run a Rails console in a compilation buffer." t)
+
 (eval-after-load "ruby-mode"
   `(progn
      (add-hook 'ruby-mode-hook 'rinari-launch)))

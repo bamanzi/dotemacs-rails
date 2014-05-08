@@ -138,7 +138,7 @@ which we're looking."
      (define-key robe-mode-map (kbd "M-.") nil)
      (define-key robe-mode-map (kbd "C-c .") 'robe-jump)
 
-     (if (< emacs-major-verson 24)
+     (if (< emacs-major-version 24)
          ;; backport from emacs-24.3
          (defun process-live-p (process)
            "Returns non-nil if PROCESS is alive.
