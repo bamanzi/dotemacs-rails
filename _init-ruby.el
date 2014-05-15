@@ -135,6 +135,8 @@ which we're looking."
 
 (eval-after-load "robe"
   `(progn
+     (define-key ruby-mode-map (kbd "C-c .") 'robe-jump)
+     
      (define-key robe-mode-map (kbd "M-.") nil)
      (define-key robe-mode-map (kbd "C-c .") 'robe-jump)
 
