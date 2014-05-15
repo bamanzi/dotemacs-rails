@@ -3,56 +3,93 @@
 
 <head>
 <meta charset="utf-8" />
-<title>web-mode.el - HTML Template Editing for Emacs - PHP JSP ASP ERB TWIG</title>
-<meta name="description" content="The GNU Emacs Major Mode web-mode.el can be used for editing HTML templates (PHP / JSP / ASP / TWIG / JS / CSS)" />
-<meta name="keywords" content="emacs, template, html, php, jsp, asp, twig, django, jinja, smarty, css, web-mode, javascript, indentation, syntax highlighting, coloring, editing, java, perl, freemarker, velocity, cheetah, tmpl, ctemplate, mustache, ngtemplate, hapax, template engine, François-Xavier Bois, blade" />
+<title>web-mode.el - html template editing for emacs</title>
+<meta name="description" content="web-mode.el is an emacs major mode for editing web templates. web-mode.el can edit html documents that embed server blocks (PHP / JSP / Twig / Django / erb) and client parts (JavaScript / Css)." />
+<meta name="keywords" content="emacs, template, html, php, jsp, asp, twig, django, jinja, smarty, css, web-mode, javascript, indentation, syntax highlighting, coloring, editing, java, perl, freemarker, velocity, cheetah, tmpl, ctemplate, mustache, ngtemplate, hapax, template engine, François-Xavier Bois, blade, erlydtl, go template, razor, play, ember.js, dust, closure, underscore.js, liquid, react, editor" />
 <meta name="generator" content="web-mode.el" />
 <meta name="msvalidate.01" content="6F7C713CC015612E54953A9D402443A1" />
+<link rel="icon" href="/favicon.png" />
 <link rel="shortcut icon" href="/favicon.png" />
+<link rel="author" href="https://plus.google.com/115250110547756788818" />
 <link rel="publisher" href="https://plus.google.com/115250110547756788818" />
 <link rel="canonical" href="http://web-mode.org" />
-<meta property="og:title" content="web-mode.el - HTML Template Editing for Emacs - PHP JSP ASP ERB DJANGO TWIG" />
-<meta property="og:type" content="site" />
+<meta property="og:title" content="web-mode.el - html template editing for emacs - js css php erb twig django" />
+<meta property="og:description" content="web-mode.el is an emacs major mode for editing web templates. web-mode.el can edit html documents that embed server blocks (PHP / JSP / Twig / Django / erb) and client parts (JavaScript / Css)." />
+<meta property="og:type" content="website" />
 <meta property="og:url" content="http://web-mode.org" />
-<meta property="og:image" content="http://web-mode.org/favicon.png" />
+<meta property="og:image" content="http://web-mode.org/web-mode.png" />
 <meta property="og:site_name" content="web-mode.el" />
 <meta property="og:locale" content="en_GB" />
 <meta name="twitter:card" content="summary" />
- <meta name="twitter:site" content="@fxbois" />
- <meta name="twitter:title" content="web-mode.el" />
- <meta name="twitter:description" content="Emacs major mode for editing html templates. Compatible with many template engines: php, jsp, twig, jinja, asp, erb." />
- <meta name="twitter:image" content="http://web-mode.org/web-mode.png" />
- <meta name="twitter:creator" content="@fxbois" />
- <meta name="twitter:url" content="http://web-mode.org" />
-<link href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700,300" rel="stylesheet" type="text/css">
+<meta name="twitter:site" content="@fxbois" />
+<meta name="twitter:title" content="web-mode.el" />
+<meta name="twitter:description" content="Emacs major mode for editing html templates. Compatible with many template engines: php, jsp, django, twig, jinja, asp, erb." />
+<meta name="twitter:image" content="http://web-mode.org/web-mode.png" />
+<meta name="twitter:creator" content="@fxbois" />
+<meta name="twitter:url" content="http://web-mode.org" />
+<link href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700,300" rel="stylesheet" type="text/css" />
+<link href="http://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css" />
 <link href="https://github.com/fxbois/web-mode/commits/master.atom"
       rel="alternate"
       title="git commits to web-mode.el"
       type="application/atom+xml" />
+<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css"
+      rel="stylesheet" />
 <style>
-BODY { font-family:sans-serif; font-size:0.9em; line-height:1.3em; }
-.about { font-size:1.2em; line-height:1.6em; }
-.features { line-height:1.6em; }
-H1 { display:block; margin-bottom:50px; font-size:3em; etter-spacing: -0.03em; font-weight: 700; }
-H1, H2 { font-family:"HelveticaNeue-CondensedBold", "Open Sans Condensed", "Helvetica", sans-serif; l }
-CODE, .code { font-size:1em; font-family:inconsolata, monospace; color:#333; }
+BODY { font-family: Ubuntu,"HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-family2:sans-serif; font-size:0.9em; line-height:1.4em; }
+
+Hx {
+position: relative;
+text-transform: uppercase;
+color: #444;
+font-family: 'Lato', Helvetica Neue, Helvetica, Arial, sans-serif;
+font-weight: 100;
+font-size:2.4em;
+border-bottom: solid 1px #eee;
+
+}
+
+.about { font-size:1.3em; line-height:1.6em; }
+.features { line-height:1.8em; }
+H1 { display:block; margin-bottom:50px; font-size:3em; letter-spacing: -0.03em; font-weight: 700; 
+     font-family:"HelveticaNeue-CondensedBold", "Open Sans Condensed", "Helvetica", sans-serif; }
+H2 { font-family:"HelveticaNeue-CondensedBold", "Open Sans Condensed", "Helvetica", sans-serif; }
+CODE, .code, .function { font-size:1em; font-family:inconsolata, monospace; color:#333; }
 .code { background:#f2f2f2; }
-CODE { display:block; padding:8px 6px; border-left:1px solid #efefef; margin-top:4px;
+CODE { display:table; min-width:600px; padding:8px 8px; border-left:1px solid #efefef; margin:8px 0;
        white-space: pre-wrap;
        white-space: -moz-pre-wrap;
-       white-space: -o-pre-wrap; width:80em; }
+       white-space: -o-pre-wrap; background:#f2f2f2; border-left:8px solid #ddd; }
 CODE:hover { background:#f2f2f2; }
 SECTION { margin-top:30px; }
-.customisation STRONG, .faq LI STRONG { display:block; margin-bottom:6px; }
+a.black { color:black; text-decoration:none; }
+.customisation li strong, .faq li strong { display:block; margin-bottom:6px; }
 .customisation LI, .faq LI { margin-bottom:10px; }
 .shortcuts LI { margin-bottom:6px; }
 .shortcut { border:1px solid #bbb; padding:1px 3px; font-family:monospace; border-radius:2px; }
 .shortcut:hover { border:1px solid #ddd; color:#777; }
-/*.shortcut:before { content: '('; }
-.shortcut:after { content: ')'; }*/
 .footer { margin-top:16px; font-size:0.9em; }
 A { color:firebrick; }
 A:hover { text-decoration:none; }
+table.columns { width:100%; }
+table.columns td { vertical-align:top; }
+section.engines table { width:100%; margin-top:10px; }
+th { text-align:left; }
+section.engines th:nth-child(1) { width:100px; }
+section.engines th:nth-child(2) { width:180px; }
+section.engines th:nth-child(3) { width:180px; }
+.fontified-code { background:black; color:#a3a1a1; width:180px; padding:10px; }
+.face-comment { color:firebrick; }
+.face-preprocessor { color:#99cea4; }
+.face-keyword { color:#0fffff; }
+.face-var { color:#ecc799; }
+.face-attr-name { color:#cdc9c9; }
+.face-attr-value { color:#d4a4a5; }
+.engines td { margin:8px 0; border-bottom:1px solid black; }
+.social { margin-top:16px; }
+.social > a { margin-left:12px; }
+.changelog a { color:black; }
+a.text { color:black; text-decoration:none; }
 </style>
 <script type="text/javascript">
 var _gaq = _gaq || [];
@@ -71,43 +108,101 @@ _gaq.push(["_trackPageview"]);
 
 <h1>web-mode.el</h1>
 
+<div id="carbonads-container" style="float:right;"><div class="carbonad"><div id="azcarbon"></div><script type="text/javascript">var z = document.createElement("script"); z.type = "text/javascript"; z.async = true; z.src = "http://engine.carbonads.com/z/54057/azcarbon_2_1_0_VERTDARK"; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(z, s);</script></div></div>
+
+
 <section class="about">
   <h2>About</h2>
-  <span class="code">web-mode.el</span> is an autonomous <strong>emacs</strong> major-mode for editing <strong>web templates</strong>: HTML documents embedding CSS / JavaScript and Server blocks.
+  <span class="code">web-mode.el</span> is an autonomous <strong>emacs</strong> major-mode for editing <strong>web templates</strong>:<br/>
+  HTML documents embedding parts (CSS / JavaScript) and blocks (client / server side)
+</section>
 
-<table style="margin:18px 0 0 0px;"><tbody><tr>
-<td style="width:150px;"><g:plus action="share" height="24" annotation="bubble"></g:plus></td>
-<td><a href="https://twitter.com/share" class="twitter-share-button" data-via="fxbois" data-size="large"></a></td>
-<td style="padding-top:6px;"><a href="http://news.ycombinator.com/submit" class="hn-share-button"></a></td>
-<td><iframe src="http://ghbtns.com/github-btn.html?user=fxbois&repo=web-mode&type=watch&count=true"
-  allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe></td>
-<td style="padding-top:6px; width:100px; "><su:badge layout="1"></su:badge></td>
-</tr></tbody></table>
+<section class="social">
+
+<div class="social" style="line-height:38px;">
+  Share
+
+  <a href="https://plus.google.com/share?url=http://web-mode.org"
+     style="text-decoration:none; color:black;"
+     onclick="_gaq.push(['_trackEvent', 'social', 'google+'])"
+     target="_blank" class="fa fa-google-plus fa-2x"></a>
+
+  <a href="https://twitter.com/intent/tweet?url=http%3A%2F%2Fweb-mode.org&text=web-mode.el,%20major%20mode%20for%20editing%20web%20templates%0A"
+     style="text-decoration:none; color:black;"
+     onclick="_gaq.push(['_trackEvent', 'social', 'twitter'])"
+     target="_blank" class="fa fa-twitter fa-2x"></a>
+
+  <a href="http://www.facebook.com/sharer/sharer.php?u=http://web-mode.org"
+     style="text-decoration:none; color:black;"
+     onclick="_gaq.push(['_trackEvent', 'social', 'facebook'])"
+     target="_blank" class="fa fa-facebook fa-2x"></a>
+
+</div>
+
+<div style="margin-top:8px;">
+
+<table><tr>
+<td style="padding-right:10px;">Support</td>
+<td style="padding-right:10px;">
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="margin-top:10px;">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">
+</form>
+</td>
+<td style="padding-top:12px;">
+  <a href="http://flattr.com/thing/1849746/web-mode-el"
+     onclick="_gaq.push(['_trackEvent', 'social', 'flattr'])" 
+     target="_blank"><img src="http://api.flattr.com/button/flattr-badge-large.png"
+                          title="Flattr this" border="0" /></a>
+</td>
+</tr></table>
+
+</div>
+
+
 </section>
 
 <section class="features">
   <h2>Native Features</h2>
   <ul>
     <li>smart <strong>indentation</strong> (according to the context : HTML, code, JavaScript or CSS)</li>
-    <li>compatibility with many <strong>template engines</strong> : PHP, JSP, ASP / ASP.NET AJAX (Atlas), Django, Twig, Jinja(2), ERB, FreeMarker, Velocity, Cheetah, Smarty, CTemplate / Mustache / Hapax / Handlebars, Blade (laravel), Knockoutjs</li>
-    <li>block <strong>navigation</strong> <span class="shortcut">C-c C-n</span> between opening and closing HTML tag or between controls (ie. <span class="code">&lt;?php if (): ?&gt; … &lt;?php endif; ?&gt;</span>, <span class="code">&lt;c:if&gt; … &lt;/c:if&gt;</span>, <span class="code">{% for %} … {% endfor %}</span>, <span class="code">{{#SECTION}} … {{/SECTION}}</span>, etc.)</li>
-    <li><strong>code folding</strong> <span class="shortcut">C-c C-f</span> for HTML and control blocks</li>
-    <li>HTML <strong>tag autoclosing</strong> (after <span class="code">&lt;/</span>)</li>
-    <li><strong>syntax highlighting</strong> (according to the type of block)</li>
-    <li><strong>snippet</strong> insertion <span class="shortcut">C-c C-i</span> (auto indented, aware of text selection)</li>
-    <li><strong>auto-completes</strong> (ex. <span class="code">?&gt;</span> after <span class="code">&lt;?php</span>)</li>
+    <li>compatibility with many <strong>template engines</strong> : PHP, JSP, GSP (Grails), ASP / ASP.NET AJAX (Atlas), Django / Twig / Jinja(2) / ErlyDTL (Zotonic), ERB, FreeMarker, Velocity, Cheetah, Smarty, CTemplate / Mustache / Hapax / Handlebars / Meteor / Blaze /ember.js, Blade (laravel), Knockoutjs, Go Template (Revel), Razor/Play, Dust, Closure (soy), underscore.js, template-toolkit, Liquid (jekyll), angular.js, web2py, mako, reactjs (jsx), mojolicious</li>
+    <li><strong>navigation</strong> <span class="shortcut">C-c C-n</span> between opening and closing HTML tags or between control blocks (e.g. <span class="code">&lt;?php if (): ?&gt; … &lt;?php endif; ?&gt;</span>, <span class="code">&lt;c:if&gt; … &lt;/c:if&gt;</span>, <span class="code">{% for %} … {% endfor %}</span>, <span class="code">{{#SECTION}} … {{/SECTION}}</span>, etc.)</li>
+    <li><strong>code folding</strong> <span class="shortcut">C-c C-f</span> for HTML elements and control blocks</li>
+    <li>HTML <strong>tag auto closing</strong> (after <span class="code">&lt;/</span>), <strong>auto opening</strong> (<span class="code">&lt;div&gt;RET&lt;/div&gt;</span>)</li>
+    <li><strong>syntax highlighting</strong> (according to the type of part/block)</li>
+    <li><strong>snippet</strong> insertion <span class="shortcut">C-c C-s</span> (auto indented, aware of text selection, engine specific)</li>
+    <li><strong>auto pairing</strong> (e.g. <span class="code">&lt;?p</span> … <span class="code">hp ?&gt;</span>, <span class="code">{% </span> … <span class="code">%}</span>)</li>
     <li><strong>comment / uncomment</strong> <span class="shortcut">C-c C-;</span> according to the type of block</li>
     <li>clever <strong>selection</strong> and <strong>expansion</strong> <span class="shortcut">C-c C-m</span></li>
     <li>css <strong>colorization</strong></li>
     <li><strong>suspicious whitespaces</strong> detection <span class="shortcut">C-c C-w</span></li>
-    <li>clever understanding of <strong>comments and strings</strong>: a quote inside an html element doesn't "corrupt" the code, PHP heredoc strings compatibility, a client block (javascript/css) can contain a string that embeds a server block that also contains strings, etc.</li>
-    <li><strong>html goodies</strong> nice handling of html attributes (no values, unquoted values, double/single quoted values), detection of void elements, compatibility with <span class="code">&lt;script type="text/html"&gt;</span>, HTML entities substitution</li>
+    <li>clever understanding of <strong>comments and strings</strong>: a quote in the content of an html element doesn't "corrupt" the code, PHP heredoc strings compatibility, variable fontification in PHP double quoted strings, a part (javascript/css) can contain a string that embeds a block (e.g. php) that also contains strings, etc.</li>
+    <li><strong>html goodies</strong> nice handling of html attributes (no values, unquoted values, double/single quoted values), detection of void elements, compatibility with <span class="code">&lt;script type="text/html"&gt;</span>, <span class="code">&lt;script type="text/jsx"&gt;</span> and <span class="code">&lt;script type="application/ld+json"&gt;</span>, HTML entities substitution, tag mismatch detection</li>
+    <li>many <strong>helpers</strong>: dom traversal /  normalization, element renaming / transposal, etc.</li>
+    <li>current HTML <strong>element highlighting</strong></li>
+    <li><strong>filling</strong> <span class="shortcut">M-q</span> compatibility (for comments and HTML text)</li>
   </ul>
 </section>
 
 <section>
   <h2>Screenshot</h2>
-  <img src="http://web-mode.org/page/v3/web-mode.png"  style="height:586px;" />
+  <div>
+    <img src="/web-mode.png"  style="height:586px;" alt="html php css js" />
+  </div>
+  Screencast on <a href="https://www.youtube.com/watch?v=i_3dQ6QQsFM">YouTube</a> (prefer HD Quality)
+</section>
+
+<section>
+  <h2>Terminology</h2>
+  <ul>
+    <li>In an HTML document, a <strong>part</strong> is interpreted by the navigator (e.g. a JavaScript part or a CSS part).</li>
+    <li>A <strong>block</strong> is processed (client-side or server-side) before being rendered by the navigator (e.g. a PHP block, an Erb block, a dustjs block etc.).</li>
+  </ul>
+As a result, a block can be located in a part that is embedded in an HTML document.
 </section>
 
 <section>
@@ -122,6 +217,7 @@ _gaq.push(["_trackPageview"]);
      title="emacs php template"
      onclick="_gaq.push(['_trackEvent', 'github', 'downloaded'])">http://github.com/fxbois/web-mode/</a>
  </p>
+ <p>web-mode.el is also available on <a href="http://melpa.milkbox.net/">melpa</a> and <a href="http://marmalade-repo.org/">marmalade</a>.</p>
  <p>web-mode.el is <a href="http://www.gnu.org/philosophy/" style="color:inherit; text-decoration:none;">GPL and Free Software</a>.</p>
 </section>
 
@@ -132,7 +228,7 @@ Then, add in your <span class="code">.emacs</span>
   <code>(require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
@@ -143,15 +239,28 @@ Then, add in your <span class="code">.emacs</span>
 </p>
 </section>
 
+<section>
+<h2>Associate an engine</h2>
+<p>A specific engine can be forced with <span class="code">web-mode-engines-alist</span>.</p>
+<code>(setq web-mode-engines-alist
+      '(("php"    . "\\.phtml\\'")
+        ("blade"  . "\\.blade\\."))
+)</code>
+<p>Using this association list is required as soon as the file extension is unknown (by web-mode) or is too general (e.g. <span class="code">*.html</span>).</p>
+<p>The recognized file extensions are listed in the <em>Engine families</em> paragraph.</p>
+<p>In summary, you may have to set both <span class="code">auto-mode-alist</span> and <span class="code">web-mode-engines-alist</span>.</p>
+</section>
+
+
 <section class="customisation">
   <h2>Customisation</h2>
   The first customisations can be put in a hook like this
 
-<code>(defun web-mode-hook ()
+<code>(defun my-web-mode-hook ()
   "Hooks for Web mode."
   (setq web-mode-markup-indent-offset 2)
 )
-(add-hook 'web-mode-hook  'web-mode-hook)</code></p></code>
+(add-hook 'web-mode-hook  'my-web-mode-hook)</code></p></code>
 
 <ul>
 
@@ -169,36 +278,147 @@ Script offset indentation (for JavaScript, Java, PHP, etc.)
 </li>
 
 <li>
+  <strong>Left padding</strong>
+For <span class="code">&lt;style&gt;</span> parts
+<code>(setq web-mode-style-padding 1)</code>
+
+For <span class="code">&lt;script&gt;</span> parts
+<code>(setq web-mode-script-padding 1)</code>
+
+For multi-line blocks
+<code>(setq web-mode-block-padding 0)</code>
+
+</li>
+
+
+<li>
+<strong>Comments</strong>
+You can choose to comment with server comment instead of client (HTML/CSS/Js) comment with
+<code>(setq web-mode-comment-style 2)</code>
+</li>
+
+<li>
 <strong>Syntax Highlighting</strong>
 Change face color
 <code>(set-face-attribute 'web-mode-css-rule-face nil :foreground "Pink3")</code>
 Available faces:<br/>
-<span class="code">web-mode-doctype-face</span>, <span class="code">web-mode-html-tag-face</span>, <span class="code">web-mode-html-attr-name-face</span>, <span class="code">web-mode-html-attr-value-face</span><br/>
-<span class="code">web-mode-css-rule-face</span>, <span class="code">web-mode-css-prop-face</span>, <span class="code">web-mode-css-pseudo-class-face</span>, <span class="code">web-mode-css-at-rule-face</span><br/>
-<span class="code">web-mode-preprocessor-face</span>, <span class="code">web-mode-string-face</span>, <span class="code">web-mode-comment-face<br/>
-web-mode-variable-name-face</span>, <span class="code">web-mode-function-name-face</span>, <span class="code">web-mode-constant-face</span>, <span class="code">web-mode-type-face</span>, <span class="code">web-mode-keyword-face</span><br/>
-<span class="code">web-mode-folded-face</span>, <span class="code">web-mode-server-attr-name-face</span>
+
+<p><strong>effects</strong>
+<span class="code">web-mode-folded-face</span>,
+<span class="code">web-mode-warning-face</span>,
+<span class="code">web-mode-whitespace-face</span>,
+<span class="code">web-mode-comment-keyword-face</span>
+</p>
+
+<p><strong>html</strong>
+<span class="code">web-mode-doctype-face</span>,
+<span class="code">web-mode-html-tag-face</span>,
+<span class="code">web-mode-html-tag-bracket-face</span>,
+<span class="code">web-mode-html-attr-name-face</span>,
+<span class="code">web-mode-html-attr-value-face</span>,
+<span class="code">web-mode-html-attr-equal-face</span>,
+<span class="code">web-mode-html-tag-custom-face</span>,
+<span class="code">web-mode-attr-tag-custom-face</span>
+</p>
+
+<p><strong>json</strong>
+<span class="code">web-mode-json-key-face</span>,
+<span class="code">web-mode-json-context-face</span>,
+<span class="code">web-mode-json-string-face</span>
+</p>
+
+<p><strong>css</strong>
+<span class="code">web-mode-css-at-rule-face</span>,
+<span class="code">web-mode-css-property-name-face</span>,
+<span class="code">web-mode-css-function-face</span>,
+<span class="code">web-mode-css-priority-face</span>,
+<span class="code">web-mode-css-pseudo-class-face</span>,
+<span class="code">web-mode-css-selector-face</span>,
+<span class="code">web-mode-css-string-face</span>
+</p>
+
+<p><strong>code</strong>
+<span class="code">web-mode-string-face</span>,
+<span class="code">web-mode-comment-face</span>,
+<span class="code">web-mode-preprocessor-face</span>,
+<span class="code">web-mode-variable-name-face</span>,
+<span class="code">web-mode-function-name-face</span>,
+<span class="code">web-mode-constant-face</span>,
+<span class="code">web-mode-type-face</span>,
+<span class="code">web-mode-keyword-face</span>,
+<span class="code">web-mode-symbol-face</span>,
+<span class="code">web-mode-builtin-face</span>
+</p>
+
+<p><strong>block</strong>
+<span class="code">web-mode-block-control-face</span>,
+<span class="code">web-mode-block-face</span> (see <span class="code">web-mode-enable-block-face</span>),
+<span class="code">web-mode-block-string-face</span>,
+<span class="code">web-mode-block-comment-face</span>
+</p>
+
+<p><strong>part</strong>
+<span class="code">web-mode-part-face</span> (see <span class="code">web-mode-enable-part-face</span>),
+<span class="code">web-mode-part-string-face</span>,
+<span class="code">web-mode-part-comment-face</span>,
+<span class="code">web-mode-javascript-string-face</span>
+</p>
+
 </li>
 
 <li>
 <strong>Shortcuts</strong>
 Change the shortcut for element navigation
-<code>(define-key web-mode-map (kbd "C-n") 'web-mode-match-tag)</code>
+<code>(define-key web-mode-map (kbd "C-n") 'web-mode-tag-match)</code>
 </li>
 
 <li>
 <strong>Snippets</strong>
 Add a snippet
-<code>(add-to-list 'web-mode-snippets '("mydiv" "&lt;div&gt;" "&lt;/div&gt;"))</code>
-name, beg, end (if region exists, the content is inserted between beg and end)
+<code>(setq web-mode-extra-snippets 
+      '(("erb" . (("name" . ("beg" . "end"))))
+        ("php" . (("name" . ("beg" . "end"))
+                  ("name" . ("beg" . "end"))))
+       ))
+</code>
 </li>
 
 <li>
-<strong>Disable features</strong>
-Autocomplete
-<code>(setq web-mode-disable-autocompletion t)</code>
+<strong>Auto-pairs</strong>
+Add auto-pair
+<code>(setq web-mode-extra-auto-pairs 
+      '(("erb"  . (("open" "close")))
+        ("php"  . (("open" "close")
+                   ("open" "close")))
+       ))
+</code>
+</li>
+
+<li>
+<strong>Enable / disable features</strong>
+
+Auto-pairing
+<code>(setq web-mode-enable-auto-pairing t)</code>
+
 CSS colorization
-<code>(setq web-mode-disable-css-colorization t)</code>
+<code>(setq web-mode-enable-css-colorization t)</code>
+
+Block face: can be used to set blocks background
+(see <span class="code">web-mode-block-face</span>)
+<code>(setq web-mode-enable-block-face t)</code>
+
+Part face: can be used to set parts background
+(see <span class="code">web-mode-part-face</span>)
+<code>(setq web-mode-enable-part-face t)</code>
+
+Comment keywords (see <span class="code">web-mode-comment-keyword-face</span>)
+<code>(setq web-mode-enable-comment-keywords t)</code>
+
+
+Heredoc (cf. PHP strings) fontification (when the identifier is <span class="code">&lt;&lt;&lt;EOTHTML</span> or
+<span class="code">&lt;&lt;&lt;EOTJAVASCRIPT</span>)
+<code>(setq web-mode-enable-heredoc-fontification t)</code>
+
 </li>
 </ul>
 
@@ -209,54 +429,219 @@ The customisations below should not be put in the hook. Declare them before load
 Add PHP constants
 <code>(setq web-mode-extra-php-constants '("constant1" "constant2"))</code>
 Also available:
-<span class="code">web-mode-extra-php-keywords</span>, 
-<span class="code">web-mode-extra-javascript-keywords</span>, 
-<span class="code">web-mode-extra-jsp-keywords</span>, 
+<span class="code">web-mode-extra-php-keywords</span>,
+<span class="code">web-mode-extra-javascript-keywords</span>,
+<span class="code">web-mode-extra-jsp-keywords</span>,
 <span class="code">web-mode-extra-asp-keywords</span>
 <br/>
 </li>
-
 <li>
-<strong>Force an engine</strong>
-A specific engine can be forced with <span class="code">web-mode-engines-alist</span>.
-<code>(setq web-mode-engines-alist
-'(("\\.smar\\'"  . "smarty")
-  ("\\.blade\\." . "blade")
-  ("\\.velo\\'"  . "velocity")))</code>
-Using this association list is required with some engines when not using the default extension: smarty (<span class="code">*.tpl</span>), velocity/cheetah (<span class="code">*.vm</span>, <span class="code">*.vtl</span>), CTemplate/Mustache (<span class="code">*.mustache</span>), blade (<span class="code">*.blade.php</span>).<br/>
-Do not forget to also set the <span class="code">auto-mode-alist</span>.
+<strong>Current element highlight</strong>
+Highlight current HTML element (see <span class="code">web-mode-current-element-highlight-face</span>)
+<code>(setq web-mode-enable-current-element-highlight t)</code>
 </li>
+
 </ul>
 
 </section>
 
 <section class="shortcuts">
   <h2>Shortcuts</h2>
+  <table class="columns"><tbody><tr>
+    <td style="width:33%;">
+   <h3>General</h3>
   <ul>
-   <li><span class="shortcut">C-c C-;</span> : comment / uncomment line(s)</li>
-   <li><span class="shortcut">C-c C-a</span> : indent entire buffer</li>
-   <li><span class="shortcut">C-c C-b</span> : beginning of HTML element</li>
-   <li><span class="shortcut">C-c C-d</span> : delete current HTML element</li>
-   <li><span class="shortcut">C-c C-e</span> : select inner HTML element</li>
-   <li><span class="shortcut">C-c C-f</span> : toggle folding on a block</li>
-   <li><span class="shortcut">C-c C-i</span> : insert snippet</li>
-   <li><span class="shortcut">C-c C-j</span> : duplicate current HTML element</li>
-   <li><span class="shortcut">C-c C-m</span> : mark and expand</li>
-   <li><span class="shortcut">C-c C-n</span> : jump to opening/closing tag</li>
-   <li><span class="shortcut">C-c C-p</span> : jump to parent HTML element</li>
-   <li><span class="shortcut">C-c C-s</span> : select current HTML element</li>
-   <li><span class="shortcut">C-c C-t</span> : HTML entities substitution</li>
-   <li><span class="shortcut">C-c C-w</span> : toggle display of invalid whitespaces</li>
+   <li><span class="shortcut">C-c C-;</span> comment / uncomment line(s)</li>
+   <li><span class="shortcut">C-c C-f</span> toggle folding on a tag/block</li>
+   <li><span class="shortcut">C-c C-i</span> indent entire buffer</li>
+   <li><span class="shortcut">C-c C-m</span> mark and expand</li>
+   <li><span class="shortcut">C-c C-s</span> insert snippet</li>
+   <li><span class="shortcut">C-c C-w</span> toggle display of invalid whitespaces</li>
+  </ul>
+  </td>
+
+  <td style="width:33%;">
+  <h3>DOM</h3>
+  <ul>
+   <li><span class="shortcut">C-c C-d d</span> show tag mismatch</li>
+   <li><span class="shortcut">C-c C-d e</span> replace HTML entities</li>
+   <li><span class="shortcut">C-c C-d n</span> normalize</li>
+   <li><span class="shortcut">C-c C-d q</span> replace dumb quotes</li>
+   <li><span class="shortcut">C-c C-d t</span> traverse dom tree</li>
+   <li><span class="shortcut">C-c C-d x</span> xpath</li>
+  </ul>
+</td>
+
+<td>
+  <h3>Block</h3>
+  <ul>
+   <li><span class="shortcut">C-c C-b c</span> block close</li>
+   <li><span class="shortcut">C-c C-b b</span> block beginning</li>
+   <li><span class="shortcut">C-c C-b e</span> block end</li>
+   <li><span class="shortcut">C-c C-b p</span> previous block</li>
+   <li><span class="shortcut">C-c C-b n</span> next block</li>
+   <li><span class="shortcut">C-c C-b k</span> block kill</li>
+   <li><span class="shortcut">C-c C-b s</span> block select</li>
+  </ul>
+</td>
+
+</tr></tbody></table>
+
+  <table class="columns"><tbody><tr>
+  <td style="width:33%;">
+  <h3>HTML element</h3>
+  <ul>
+   <li><span class="shortcut">C-c /</span> element close</li>
+   <li><span class="shortcut">C-c C-e b</span> element beginning</li>
+   <li><span class="shortcut">C-c C-e c</span> element clone</li>
+   <li><span class="shortcut">C-c C-e d</span> child element (down)</li>
+   <li><span class="shortcut">C-c C-e e</span> element end</li>
+   <li><span class="shortcut">C-c C-e i</span> select element content (inner)</li>
+   <li><span class="shortcut">C-c C-e k</span> element kill</li>
+   <li><span class="shortcut">C-c C-e n</span> next element</li>
+   <li><span class="shortcut">C-c C-e p</span> previous element</li>
+   <li><span class="shortcut">C-c C-e r</span> rename element</li>
+   <li><span class="shortcut">C-c C-e s</span> select element</li>
+   <li><span class="shortcut">C-c C-e u</span> parent element (up)</li>
+   <li><span class="shortcut">C-c C-e u</span> element vanish</li>
+  </ul>
+</td>
+
+<td style="width:33%;">
+  <h3>HTML tag</h3>
+  <ul>
+   <li><span class="shortcut">C-c C-t b</span> tag beginning</li>
+   <li><span class="shortcut">C-c C-t e</span> tag end</li>
+   <li><span class="shortcut">C-c C-t m</span> fetch matching tag (also available for active blocks)</li>
+   <li><span class="shortcut">C-c C-t s</span> select tag</li>
+   <li><span class="shortcut">C-c C-t p</span> previous tag</li>
+   <li><span class="shortcut">C-c C-t n</span> next tag</li>
+  </ul>
+</td>
+
+<td>
+  <h3>HTML attribute</h3>
+  <ul>
+   <li><span class="shortcut">C-c C-a b</span> attribute beginning</li>
+   <li><span class="shortcut">C-c C-a e</span> attribute end</li>
+   <li><span class="shortcut">C-c C-a s</span> attribute select</li>
+   <li><span class="shortcut">C-c C-a t</span> attribute transpose</li>
+   <li><span class="shortcut">C-c C-a n</span> attribute next</li>
+  </ul>  
+</td>
+
+
+</tr></tbody></table>
+
+</section>
+
+<section class="helpers">
+  <h2>Helper functions</h2>
+  <ul>
+   <li><span class="function">web-mode-apostrophes-replace</span> : replace ' by ’ (only in HTML content)</li>
+   <li><span class="function">web-mode-entities-replace</span> : replace html entities (only in HTML content)</li>
+   <li><span class="function">web-mode-quotes-replace</span> : replace dumb quotes (only in HTML content)</li>
   </ul>
 </section>
 
-<section class="shortcuts">
-  <h2>Helper functions</h2>
-  <ul>
-   <li><span class="function">web-mode-replace-apostrophe</span> : replace ' by ’ (only in HTML content)</li>
-   <li><span class="function">web-mode-replace-entities</span> : replace html entities (only in HTML content)</li>
-   <li><span class="function">web-mode-replace-quotes</span> : replace dumb quotes (only in HTML content)</li>
-  </ul>
+<section class="engines">
+<h2>Engine families</h2>
+Never forget to update the <span class="code">auto-mode-alist</span>.
+<table>
+<thead><th>name</th><th>cousins</th><th>extensions</th><th>example</th></thead>
+<tbody>
+<tr>
+<td>django</td>
+<td>twig, jinja, jinja2, erlydtl, swig, liquid</td>
+<td>*.djhtml, *twig*, *.dtl, *.tmpl</td>
+<td><img src="/images/emacs-django.png" title="emacs django" /></td>
+</tr>
+<tr>
+<td>php</td>
+<td></td>
+<td>*.php, *.psp, *.ctp</td>
+<td><img src="/images/emacs-php.png" title="emacs php html" alt="php" /></td>
+</tr>
+
+<tr>
+<td>erb</td><td>eruby, ember, erubis</td><td>*.erb, *.rhtml</td>
+<td><img src="/images/emacs-erb.png" title="emacs erb ruby" /></td>
+</tr>
+
+<tr>
+<td>velocity</td><td>cheetah, vtl</td><td>*.vsl, *.vtl, *.vm</td>
+<td><img src="/images/emacs-velocity.png" title="emacs velocity" /></td>
+</tr>
+
+<tr>
+<td>blade</td><td>laravel</td><td>*blade*</td>
+<td><img src="/images/emacs-blade.png" title="emacs blade laravel" /></td>
+</tr>
+
+
+<tr>
+<td>go</td><td>gtl</td><td>*.gohtml, *.gotmpl</td>
+<td><img src="/images/emacs-gohtml.png" title="emacs go template" /></td>
+</tr>
+
+<tr>
+<td>jsp</td><td></td><td>*.jsp, *.gsp</td>
+<td><img src="/images/emacs-jsp.png" title="emacs jsp" /></td>
+</tr>
+
+<tr>
+<td>freemarker</td><td></td><td>*.ftl</td>
+<td><img src="/images/emacs-freemarker.png" title="emacs freemarker" /></td>
+</tr>
+
+<tr>
+<td>aspx</td><td></td><td>*.aspx, *.ascx</td>
+<td><img src="/images/emacs-aspx.png" title="emacs aspx" /></td>
+</tr>
+
+<tr>
+<td>asp</td><td></td><td>*.asp</td>
+<td><img src="/images/emacs-asp.png" title="emacs asp" /></td>
+</tr>
+
+<tr>
+<td>razor</td><td>play, play2</td><td>*.cshtml, *.vbhtml</td>
+<td><img src="/images/emacs-razor.png" title="emacs razor" /></td>
+</tr>
+
+<tr>
+<td>ctemplate</td><td>mustache, handlebars, ember, hapax, ngtemplate, meteor, blaze</td><td>*.hbs, *.mustache</td>
+<td><img src="/images/emacs-ctemplate.png" title="emacs ctemplate html" /></td>
+</tr>
+
+<tr>
+<td>smarty</td><td></td><td>*.tpl</td>
+<td><img src="/images/emacs-smarty.png" title="emacs smarty" /></td>
+</tr>
+
+<tr>
+  <td>dust</td><td></td><td>*.dust</td>
+  <td><img src="/images/emacs-dust.png" title="emacs dust.js" /></td>
+</tr>
+
+<tr>
+  <td>closure</td><td></td><td>*.soy</td>
+  <td><img src="/images/emacs-closure.png" title="emacs closure" /></td>
+</tr>
+
+<tr>
+  <td>underscorejs</td><td></td><td></td>
+  <td><img src="/images/emacs-underscorejs.png" title="emacs underscore.js" /></td>
+</tr>
+
+<tr>
+  <td>template-toolkit</td><td></td><td>*.tt, *.tt3</td>
+  <td><img src="/images/emacs-template-toolkit.png"
+           title="emacs template-toolkit" /></td>
+</tr>
+
+</tbody>
+</table>
 </section>
 
 <section class="faq">
@@ -275,17 +660,15 @@ Add those lines in the web-mode hook
 </li>
 <li>
 <strong>Platforms/Compatibility</strong>
-Tested on GNU/Linux and OSX<br/>
+Tested on GNU/Linux and OSX (anyone using it on Windows ?)<br/>
 Tested with versions 24 and 23.<br/>
-<!--For 23, add this line in your <span class="code">.emacs</span>
-<code>(unless (fboundp 'prog-mode) (defalias 'prog-mode 'fundamental-mode))</code>-->
 </li>
 <li>
 <strong>I want to use both php-mode and web-mode</strong>
 You can do it this way
 <code>(add-to-list 'auto-mode-alist '("\\.php\\'" . php-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))</code>
-The matching is done on the path. You can alo configure like this if your templates are stored in a subdirectory called <span class="code">views</span>, <span class="code">html</span> or <span class="code">templates</span>.
+(add-to-list 'auto-mode-alist '("\\.blade\\.php\\'" . web-mode))</code>
+Never forget that the matching is done on the <em>path</em> (not just on the filename). If your templates are stored in a subdirectory called <span class="code">views</span>, <span class="code">html</span> or <span class="code">templates</span>, you can use such a configuration line:
 <code>(add-to-list 'auto-mode-alist '("/\\(views\\|html\\|templates\\)/.*\\.php\\'" . web-mode))</code>
 </li>
 <li>
@@ -295,16 +678,38 @@ Put this line in the web-mode-hook
 You can also use <span class="code">M-x electric-indent-mode</span>
 </li>
 <li>
-<strong>Can I contribute ?</strong>
-Of course, you can send bug reports/fixes, or help me empty this <a href="http://www.amazon.fr/gp/registry/wishlist/38M66N42GXA5A">amazon wishlist</a>.
+<strong>I wan't to use smartparens</strong>
+<code>(defun my-web-mode-hook ()
+  (setq web-mode-enable-auto-pairing nil))
+
+(add-hook 'web-mode-hook  'my-web-mode-hook)
+
+(defun sp-web-mode-is-code-context (id action context)
+  (when (and (eq action 'insert)
+             (not (or (get-text-property (point) 'part-side) 
+                      (get-text-property (point) 'block-side))))
+
+    t))
+(sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))</code>
+Special thanks to Johan Ekenberg for this tip.
 </li>
 <li>
-<strong>Why are you re implementing (superficially) so many minor modes ? (css colorization, whitespaces)</strong>
-web-mode.el is a strange creature that has to deal with code that recursively embeds other language code blocks (ie. HTML embeds JavaScript that embeds PHP). To achieve this, relying only on font-locking was not feasible. Two techniques are used for syntax highlighting: direct assignment of the "font" text property (for HTML tags/attributes, strings, comments) and font-locking for blocks: client (JavaScript/CSS) and server (PHP/JSP/etc.). Incompatibility with some minor modes is a consequence (some modes need that the major mode relies at 100% on font-locking). I am fully aware that this is unfortunate and that this is not the "emacs spirit". 
+<strong>Can I contribute ?</strong>
+Of course! You can <a href="https://github.com/fxbois/web-mode/issues/new" style="color:black;">send</a> bug reports/fixes, feature requests, etc.<br/>
+You can also donate (see the button at the top of the page) or help empty this <a href="http://www.amazon.fr/gp/registry/wishlist/38M66N42GXA5A">amazon wishlist</a><br/>
+(special thanks to the first generous donors: Ed Singleton, <a href="http://buzzdistrict.com" class="black" alt="agence de communication, paris">Laurence Bois</a>, Daniel Parnell, Digital Strategies, Lars Hartmann, Christian Kruse, Johan Ekenberg, LE Sarvell KB, Clint Howarth).
 </li>
+<!--<li>
+<a name="font-locking"></a>
+<strong>Why are you re implementing (superficially) so many minor modes ? (css colorization, whitespaces, keyword highlight in comments)</strong>
+web-mode.el is a strange creature that has to deal with code that recursively embeds other language code blocks (e.g. HTML embeds JavaScript that embeds PHP). To achieve this, relying only on font-locking was not feasible. Two techniques are used for syntax highlighting: direct assignment of the "font" text property (for HTML tags/attributes, strings, comments) and font-locking for blocks and parts. Incompatibility with some minor modes is a consequence ; indeed some of them require that the major mode relies at 100% on font-locking. I am fully aware that this is unfortunate and that this is not the "emacs spirit".
+</li>-->
 <li>
 <strong>Syntax coloring does not work</strong>
-Do not enable rainbow-mode or whitespace-mode with web-mode (see above).
+Some users might report issues when using themes that not play nicely with web-mode.<br/>
+Before reporting a bug about highlighting, try a theme (e.g. <a href="https://github.com/bbatsov/solarized-emacs" class="text">Solarized</a>).<br/>
+Tips: when using emacs in a terminal, always try to enable 256 colors compatibility (xterm-256color).<br/>
+If you consider that the color of HTML tags too light, you can customize faces like <span class="code">web-mode-html-tag-face</span> or <span class="code">web-mode-html-attr-face</span>.
 </li>
 </ul>
 </section>
@@ -312,33 +717,128 @@ Do not enable rainbow-mode or whitespace-mode with web-mode (see above).
 <section class="support">
 <h2>Support</h2>
 <div>
-Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">https://groups.google.com/d/forum/web-mode</a>
+<p>Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">https://groups.google.com/d/forum/web-mode</a></p>
+<p>To report a bug, prefer submitting an issue on <a href="https://github.com/fxbois/web-mode/issues/new">GitHub</a> (note: a screenshot and the output of <span class="code">M-x web-mode-debug</span> are always useful).</p>
 </div>
 </section>
 
 <section class="changelog">
 <h2>Changelog</h2>
+
 <div class="version">
-<span>2013-XX : current/devel</span>
+  <span>2014-XX : current/devel</span>
+  <ul>
+    <li></li>
+  </ul>
+</div>
+
+<div class="version">
+  <span>2014-05: v9 aka “IRCAM” Release</span>
+  <ul>
+    <li>important milestone: compatibility with minor modes relying on font-locking</li>
+    <li>partial block invalidation is enabled by default: <span class="code">(setq web-mode-enable-block-partial-invalidation t)</span>: altering huge php/asp blocks is way faster</li>
+    <li>engine compatibility: web2py (python), mako (python), mason (perl), reactjs (jsx), blaze, mojolicious (perl)</li>
+    <li>compatibility with <a href="http://jshint.com" class="text">JSHint</a>: <span class="code">web-mode-jshint</span></li>
+    <li>helpers: <span class="code">web-mode-element-mute-blanks</span> (put comments between the children elements), <span class="code">web-mode-attribute-beginning|end|select|transpose</span></li>
+    <li>compatibility with js and css templates: e.g. <span class="code">*.js.erb</span> or <span class="code">*.css.erb</span></li>
+    <li>compatibility with Grails (gsp) <span class="code">&lt;r:script&gt;</span> javascript parts</li>
+    <li><span class="code">backward|forward-sexp</span> deals better with comments</li>
+    <li>indentation improvements: multiline statements (e.g. <span class="code">-&gt;</span> at the beginning of a php line), <span class="code">switch ... case</span></li>
+    <li>less flickering during html tag attribute highlight</li>
+    <li>asynchronous control blocks detection</li>
+    <li>faster undo</li>
+    <li>more robust string highlighting</li>
+    <li>alternative delimiters can be defined for smarty (see <span class="code">web-mode-engines-alternate-delimiters</span>)</li>
+    <li>faces: <span class="code">web-mode-css-variable-face</span> for CSS variables (<span class="code">--*</span>), <span class="code">web-mode-html-attr-engine-face</span> for engine specific attributes (e.g. <span class="code">ng-*</span> for angularjs) (see also <span class="code">web-mode-engine-attr-regexps</span>)</li>
+    <li>part and block auto opening</li>
+  </ul>
+</div>
+
+<div class="version">
+  <span>2014-01: v8 aka “Copenhagen” Release</span>
+  <ul>
+    <li>element auto opening when hitting RET between collapsed start and end tags</li>
+    <li><span class="code">web-mode-debug</span> displays useful informations for debugging</li>
+    <li><span class="code">web-mode-dom-normalize</span>: change the case (lower-case for tags / attributes), convert entities, indent, smart parens (see <span class="code">web-mode-normalization-rules</span>)</li>
+    <li>faces: it is now possible to customize the color of html tag brackets and of the equal character between the attr name and the attr value. See <span class="code">web-mode-html-tag-bracket-face</span> and <span class="code">web-mode-html-attr-equal-face</span><br/>
+You can also choose a different color for custom elements (e.g. <span class="code">&lt;polymer-element&gt;</span>) and custom attributes (e.g. <span class="code">data-*</span>). See <span class="code">web-mode-html-tag-custom-face</span> and <span class="code">web-mode-html-attr-custom-face</span></li>
+    <li>feature: highlight the current html element (see <span class="code">web-mode-enable-current-element-highlight</span> and <span class="code">web-mode-current-element-highlight-face</span>)</li>
+    <li>engine compatibility: template-toolkit (perl), liquid (jekyll), angular.js</li>
+    <li>asp: better indentation</li>
+    <li>razor: better indentation / fontification</li>
+    <li>html: compatibility with custom HTML elements (e.g. Google Polymer elements like <span class="code">&lt;polymer-element&gt;</span>)</li>
+    <li>javascript: font-locking improvement, better regexp tokenizing <span class="code">str.replace(/"/gi,'"')</code></li>
+    <li>django: <span class="code">{% comment %}</span> &hellip; <span class="code">{% endcomment %}</span> comments, fontification of “types”, compatibility with new blocks (<span class="code">{% verbatim %}</span>, <span class="code">{% empty %}</span>)</li>
+    <li>erb: heredoc strings compatibility, var interpolation in strings, ruby-mode.el and web-mode.el font-locking are more consistent</li>
+    <li>php: var interpolation in strings, if / else statements without braces are indented</li>
+    <li>blade: compatibility with <span class="code">@section ... @stop</span> syntax (<span class="code">@section ... @endsection</span> is still supported)</li>
+    <li>helper functions: <span class="code">web-mode-block-kill</span> , <span class="code">web-mode-block-select</span>, <span class="code">web-mode-element-vanish</span> (start tag and end tag are removed, but the content is kept), <span class="code">web-mode-element-wrap</span>, <span class="code">web-mode-element-transpose</span>, <span class="code">web-mode-element-children-fold-or-unfold</span></li>
+    <li>snippets / auto-pairing: auto-pairs and snippets are now specific to engines.</li>
+  </ul>
+</div>
+
+<div class="version">
+<span>2013-09: v7 aka “Verteuil” Release</span>
 <ul>
-  <li>new helper functions: web-mode-replace-(entities|quotes)</li>
+  <li>optimized region invalidation for asp and css</li>
+  <li>better asp indentation</li>
+  <li>compatibility with new engines: dustjs, underscore.js, closure (soy)</li>
+  <li>more core factorisation for indentation, block navigation and folding</li>
+  <li>new functions: <span class="code">web-mode-set-engine</span>, <span class="code">web-mode-element-child</span>, <span class="code">web-mode-dom-traverse</span> (for a dom tree traversal), <span class="code">web-mode-xpath</span></li>
+  <li>specific menu in the menu-bar</li>
+  <li>block controls (e.g. <span class="code">&lt?php if ($x): ?&gt;</span> , <span class="code">{% if x %}</span> ) are now considered when calculating markup indentation</li>
+  <li>left padding can be defined with <span class="code">web-mode-style-padding</span> (default: 1), <span class="code">web-mode-script-padding</span> (default: 1), <span class="code">web-mode-block-padding</span> (default: 0)</li>
+  <li>better behavior of cursor jumping when closing an HTML element</li>
+  <li><span class="code">web-mode-enable-comment-keywords</span> can be used with <span class="code">web-mode-comment-keywords</span> to highlight keywords in comments (with <span class="code">web-mode-comment-keyword-face</span> face)</li>
+  <li>shortcuts now comply with emacs rules (<span class="shortcut">C-c letter</span> is reserved)</li>
+  <li><span class="code">web-mode-tag-end</span>, <span class="code">web-mode-element-end</span> move point after <span class="code">&gt;</span></li>
+</ul>
+</div>
+
+<div class="version">
+<span>2013-06: v6 aka “Roma” Release</span>
+<ul>
+  <li>complete rewrite of the indentation code: web-mode.el can be used to edit plain php, css or javascript code (see <span class="code">web-mode-content-types-alist</span>)</li>
+  <li>compatibility with <span class="code">&lt;script type="application/ld+json"&gt;</span></li>
+  <li>faster, smaller and more robust indentation function for code (php, js, etc.)</li>
+  <li><span class="code">web-mode-enable-block-faces</span></li>
+  <li><span class="code">web-mode-enable-heredoc-fontification</span></li>
+  <li>30% speedup when editing http://www.w3.org/html/wg/drafts/html/master/</li>
+  <li>compatibility with the Go Template Engine, vbscript asp</li>
+  <li>yasnippets are indented (thx Lincoln de Sousa for the advice)</li>
+  <li>helpers: web-mode-xml-replace</li>
+  <li>compatibility with erlydtl</li>
+  <li>imenu first experiment</li>
+  <li>css colorization : foreground always readable (thx @tadfisher)</li>
+  <li>more robust code for tag/element navigation</li>
+  <li>better switch case indentation</li>
+  <li>indent html content with <span class="code">(setq web-mode-indent-style 2)</span></li>
+  <li>basic compatibility with fill-paragraph <span class="shortcut">M-q</span> : handles comments and html text</li>
+</ul>
+</div>
+
+<div class="version">
+<span>2013-03: v5 aka “Tignes” Release</span>
+<ul>
+  <li>show tag mismatched</li>
+  <li>new helper functions: web-mode-(entities|quotes)-replace</li>
   <li>compatibility with the Blade template engine (laravel framework)</li>
   <li>invalid whitespaces display</li>
   <li>compatibility with <span class="code">&lt;script type="text/html"&gt;</span> useful for knockoutjs for example (thx Anatoly Kudinov)</li>
   <li>code refactoring (with <span class="code">dolist</span> and <span class="code">dotimes</span>) (thx aiwass93)</li>
  <li>new helper functions: <span class="code">web-mode-server-block-beg-pos</span>, <span class="code">web-mode-server-block-end-pos</span>, <span class="code">web-mode-prev-server-block-pos</span>, <span class="code">web-mode-next-server-block-pos</span>, <span class="code">web-mode-prev-server-block</span>, <span class="code">web-mode-next-server-block</span></li>
  <li>avoid dependency on cl (thx Ivan Toshkov)</li>
- <li>compatibility with new engines: CTemplate/Mustache/Handlebars</li>
+ <li>compatibility with new engines: CTemplate/Mustache/Handlebars/Meteor/ember.js</li>
  <li>better compatbility with emacs 23 (thank you @Archenoth @almost @johnjcamilleri @NateEag)</li>
  <li>more extensions recognized (html.twig)</li>
  <li>django fixes (thx vigneshsarma)</li>
 </ul>
 
 <div class="version">
-<span>2013-01 : v4.0 aka “Trianon Palace” Release</span>
+<span>2013-01: v4 aka “Trianon Palace” Release</span>
 <ul>
   <li>compatibility with new engines: velocity/cheetah, smarty</li>
-  <li>compatibility with the alternative FreeMaker syntax: <span class="code">[# ]</span> <span class="code">[@ ]</span> (thx Daniel Dekany)</li>
+  <li>compatibility with the alternative FreeMarker syntax: <span class="code">[# ]</span> <span class="code">[@ ]</span> (thx Daniel Dekany)</li>
   <li>indentation improvement (thx gnuvince)</li>
   <li>speed improvement when using <span class="code">web-mode-engines-alist</span></li>
 </ul>
@@ -346,7 +846,7 @@ Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">ht
 </div>
 
 <div class="version">
-<span>2012-12 : v3.5 aka “St Petersbourg” Release</span>
+<span>2012-12: v3.5 aka “St Petersbourg” Release</span>
 <ul>
 <li>compatibility with the PHP short tags syntax (adapted from Etenil patch)</li>
 <li>speed optimizations with a better identification of the region to invalidate</li>
@@ -356,16 +856,16 @@ Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">ht
 </ul>
 </div>
 <div class="version">
-<span>2012-11 : v3.0 aka “Sandy at the Knickerbocker Club” Release</span>
+<span>2012-11: v3 aka “Sandy at the Knickerbocker Club” Release</span>
 <ul>
-<li>block identification (language, type, side) is done outside of font-locking. This code refactoring (and well as many other improvements) has been done as result a code review done by Stefan Monnier (thank you Stefan). This loop also identifies blocks (style, script, php etc. setting text-properties like server-side, client-side etc.)</li>
+<li>block identification (language, type, side) is done outside of font-locking. This code refactoring (and well as many other improvements) has been done as result of a code review done by Stefan Monnier (thank you Stefan). This loop also identifies blocks (style, script, php etc. setting text-properties like server-side, client-side etc.)</li>
 <li>compatibility with yasnippet (thx Joao)</li>
 <li>html5 aware (cf. new void tags)</li>
 <li>better handling of html attributes (unquoted, single/double quoted)</li>
 <li>php here|nowdoc syntax compatibility (for string identification)</li>
 <li>customization of indentation style with the var <span class="code">web-mode-indent-style</span>: 1=default, 2=leftish</li>
 <li>new var : web-mode-tag-autocomplete-style. With the value 2, inserting a &gt; triggers auto closing of the element</li>
-<li>more folding (ie. <span class="code">{% for | if | while %}</span> <span class="code">{% endfor | endif | endwhile %}</span>)</li>
+<li>more folding (e.g. <span class="code">{% for | if | while %}</span> <span class="code">{% endfor | endif | endwhile %}</span>)</li>
 <li><span class="code">&lt;tag&gt;&lt;/tag&gt;</span> : cursor jumps between open and closing tag (thx analysis918)</li>
 <li>new templating engines compatibility : twig (symfony), jinja, django, liquidmarkup (ruby)</li>
 <li>css colorization (similar to rainbow-mode.el, thx Julien Danjou for your answers)</li>
@@ -373,7 +873,7 @@ Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">ht
 </ul>
 </div>
 <div class="version">
-<span>2012-09 : v2.0 aka “La Baule” Release</span>
+<span>2012-09: v2 aka “La Baule” Release</span>
 <ul>
   <li>basic ASP compatibility</li>
   <li>code folding</li>
@@ -386,7 +886,7 @@ Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">ht
 </ul>
 </div>
 <div class="version">
-<span>2012-05 : v1.0 aka “Valençay” Release</span>
+<span>2012-05: v1 aka “Valençay” Release</span>
 <ul>
   <li>JSP basic support</li>
   <li>better syntax for snippets</li>
@@ -401,7 +901,7 @@ Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">ht
 </ul>
 </div>
 <div class="version">
-<span>2011-08 : v0 aka “La Ferté-Vidame” Release</span>
+<span>2011-08: v0 aka “La Ferté-Vidame” Release</span>
 <ul>
   <li>first experiments</li>
 </ul>
@@ -410,57 +910,35 @@ Dedicated google group : <a href="https://groups.google.com/d/forum/web-mode">ht
 
 <section class="contributors">
 <h2>Contributors</h2>
-Ivan Toshkov, Guillaume Pasquet, Andrei Chitu, Jose Peleteiro
+Ivan Toshkov, Guillaume Pasquet, Andrei Chitu, Jose Peleteiro, Tad Fisher, Lee SanGu, Igor Shymko, Teruki Shigitani, Ed Slocomb, Adam Sokolnicki, Haijun Yang, Mitchel Humpherys, Brent Carmer, Bin Chen
 </section>
 
 <section class="todo">
   <h2>Todo</h2>
   <ul>
-    <li>how can I automatically disable whitespace-mode and rainbow-mode ? (they break web-mode, see FAQ)</li>
-    <li>should I extend modify-syntax-entry ?</li>
+    <li>Nice project for a web-mode.el friend: setting up a unit test framework to avoid regressions</li>
   </ul>
 </section>
 
 <section>
 <h2>Author</h2>
 <p><span class="author">François-Xavier Bois</span> - &lt; fxbois AT Google Mail Service &gt;</p>
-<p>Co-founder and CTO of <a href="http://www.kernix.com" title="datamining, machine learning" style="color:inherit">KerniX</a>, Digital Agency (Web/Mobile) in Paris (FR).</p>
+<p>Co-founder and CTO of <a href="http://www.kernix.com/opensource" title="developpement wordpress / symfony" style="color:inherit">Kernix</a>, Digital Agency (Web/Mobile) in Paris (FR).</p>
 <p>
  <a href="http://twitter.com/fxbois">@fxbois</a> -
  <a href="https://plus.google.com/115250110547756788818?rel=author" rel="author">+fxbois</a>
 </p>
+<p>
+ web-mode.el has been presented to the <em>7th European Lisp Symposium</em> with paper 
+ <a href="http://web-mode.org/papers/els2014-fxbois-web-mode-el.pdf" style="color:black;">Heterogeneous recursive code parsing with Emacs Lisp</a>.
+<p>
 </section>
 
-<script type="text/javascript">
-window.___gcfg = {
-  lang: "en-US"
-};
-(function() {
-  var po = document.createElement("script");
-  po.type = "text/javascript"; po.async = true;
-  po.src = "https://apis.google.com/js/plusone.js";
-  var s = document.getElementsByTagName("script")[0];
-  s.parentNode.insertBefore(po, s);
-})();
-</script>
-
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
 <script>
-    (function(d, t) {
-        var g = d.createElement(t),
-            s = d.getElementsByTagName(t)[0];
-        g.src = '//hnbutton.appspot.com/static/hn.js';
-        s.parentNode.insertBefore(g, s);
-    }(document, 'script'));
-</script>
-
-<script type="text/javascript">
-  (function() {
-    var li = document.createElement('script'); li.type = 'text/javascript'; li.async = true;
-    li.src = ('https:' == document.location.protocol ? 'https:' : 'http:') + '//platform.stumbleupon.com/1/widgets.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(li, s);
-  })();
+setTimeout(function() { _gaq.push(['_trackEvent', 'reading', '30 seconds']);} , 30000);
+setTimeout(function() { _gaq.push(['_trackEvent', 'reading', '2 minutes']);}  , 120000);
+setTimeout(function() { _gaq.push(['_trackEvent', 'reading', '6 minutes']);}  , 360000);
+setTimeout(function() { _gaq.push(['_trackEvent', 'reading', '12 minutes']);} , 720000);
 </script>
 
 </body>
