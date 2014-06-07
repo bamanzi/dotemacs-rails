@@ -73,3 +73,6 @@
 
 (defalias 'anything-rake-tasks 'rake)
 
+;; ** rails-log
+(autoload 'rails-log-show-development "rails-log-mode"
+  "Run tail -f in the development.log file and display the output in a buffer." t)
