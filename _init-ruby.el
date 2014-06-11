@@ -217,3 +217,13 @@ A process is considered alive if its status is `run', `open',
      (add-to-list 'which-func-modes 'ruby-mode)
      (add-to-list 'which-func-modes 'enh-ruby-mode)
      ))
+
+;; *** milkode (similar to grep but with pre-index feature)
+(autoload 'milkode:search-at-point "milkode"
+  "Milkode search current package at point text. If the prefix was C-u, search all registered packages" t)
+
+(autoload 'milkode:search-from-all-packages "milkode"
+  "Milkode search all registered packages using `M-x grep`" t)
+
+(define-key search-map (kbd "g m") 'milkode:search-at-point)
+(define-key search-map (kbd "g M") 'milkode:search-from-all-packages)
