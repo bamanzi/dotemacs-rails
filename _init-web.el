@@ -76,3 +76,13 @@
 (autoload 'rainbow-mode "rainbow-mode"
   "Colorize strings that represent colors." t)
 
+;; ** misc
+;; *** know-your-http-well
+(autoload 'http-status-code "http-status-codes"
+  "Display the meaning of an HTTP status code or phrase" t)
+
+(autoload 'http-method "http-methods"
+  "Display the meaning of an HTTP method" t)
+
+(autoload 'http-header "http-headers"
+  "Display the meaning of an HTTP header" t)
