@@ -1,5 +1,5 @@
 
-;;** web-mode
+;; ** web-mode
 (autoload 'web-mode "web-mode"
   "Major mode for editing mixed HTML Templates." t)
 
@@ -12,7 +12,7 @@
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
   )
 
-;;** multi-web-mode
+;; *** multi-web-mode
 (autoload 'multi-web-mode "multi-web-mode"
   "Enables the multi web mode chunk detection and indentation" t)
 (autoload 'multi-web-global-mode "multi-web-mode"
@@ -31,16 +31,20 @@
 ;;(multi-web-global-mode 1)
 
 
-;;** php-mode
+;; ** php
 ;;use this fork: https://github.com/ejmr/php-mode
 (autoload 'php-mode  "php-mode"
   "Major mode for editing PHP code." t)
 
 ;;(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . php-mode))
 
+;; *** geben debugger
+(autoload 'geben "geben"
+  "Start GEBEN, a DBGp protocol frontend - a script debugger." t)
 
-;;** javascript
-;;*** espresso
+
+;; ** javascript
+;; *** espresso
 ;;http://www.nongnu.org/espresso/
 (autoload 'espresso-mode "espresso"
   "Major mode for editing JavaScript source text." t)
@@ -49,7 +53,7 @@
 (if (string< emacs-version "23.2")
     (add-to-list 'auto-mode-alist '("\\.js\\'" . espresso-mode)))
 
-;;*** js2-mode
+;; *** js2-mode
 ;;this fork is maintained actively: https://github.com/mooz/js2-mode
 ;;here we use the emacs-23 branch: https://github.com/mooz/js2-mode/tree/emacs23
 
@@ -63,7 +67,12 @@
      (if (require 'js2-imenu-extras nil t)
 	 (js2-imenu-extras-setup))))
 
+;; *** jquery-doc
+(autoload 'jquery-doc "jquery-doc"
+  "Displays the jquery doc in a buffer." t)
 
-;;** css
+
+;; ** css
 (autoload 'rainbow-mode "rainbow-mode"
   "Colorize strings that represent colors." t)
+
