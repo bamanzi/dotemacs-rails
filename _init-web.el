@@ -86,3 +86,6 @@
 
 (autoload 'http-header "http-headers"
   "Display the meaning of an HTTP header" t)
+
+(autoload 'css-property "know-your-css-well"
+  "Undocumented." t) 
