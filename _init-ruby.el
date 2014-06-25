@@ -181,6 +181,23 @@ A process is considered alive if its status is `run', `open',
       (require 'gdb-mi)
       (provide 'gdb-ui))))
 
+;; *** helper to show source code when debugging in inf-ruby
+(eval-after-load "inf-ruby"
+  `(progn
+     (load-library "ruby-debug")
+     
+     (define-key inf-ruby-mode-map (kbd "C-c C-s") 'rubyd-debug-activate)
+     (define-key inf-ruby-mode-map (kbd "C-c C-n") 'rubyd-debug-deactivate)
+     
+     ))
+
+;; ** syntax checking
+;; *** enh-ruby-mode built-in
+;; *** flycheck
+;; *** rubocop
+(autoload 'rubocop-check-current-file "rubocop"
+  "Run on current file." t)
+
 
 ;; ** misc
 ;; *** ruby-block
@@ -207,10 +224,6 @@ A process is considered alive if its status is `run', `open',
      (speedbar-add-supported-extension ".rake")
      ))
 
-;; *** rubocop
-(autoload 'rubocop-check-current-file "rubocop"
-  "Run on current file." t)
-
 ;; *** which-func
 (eval-after-load "which-func"
   `(progn
@@ -219,11 +232,11 @@ A process is considered alive if its status is `run', `open',
      ))
 
 ;; *** milkode (similar to grep but with pre-index feature)
-(autoload 'milkode:search-at-point "milkode"
-  "Milkode search current package at point text. If the prefix was C-u, search all registered packages" t)
+(autoload 'milkode:search "milkode"
+  "Milkode search current package using `M-x grep`" t)
 
 (autoload 'milkode:search-from-all-packages "milkode"
   "Milkode search all registered packages using `M-x grep`" t)
 
-(define-key search-map (kbd "g m") 'milkode:search-at-point)
+(define-key search-map (kbd "g m") 'milkode:search)
 (define-key search-map (kbd "g M") 'milkode:search-from-all-packages)
