@@ -76,3 +76,11 @@
 ;; ** rails-log
 (autoload 'rails-log-show-development "rails-log-mode"
   "Run tail -f in the development.log file and display the output in a buffer." t)
+
+;; ** misc
+
+(defun eshell/rdebug-rails3 ()
+  "Use `realgud-rdebug' to start debugging rails application."
+  (interactive)
+  (require 'realgud)
+  (rdebug "rdebug script/rails -- server"))
