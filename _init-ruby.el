@@ -240,3 +240,9 @@ A process is considered alive if its status is `run', `open',
 
 (define-key search-map (kbd "g m") 'milkode:search)
 (define-key search-map (kbd "g M") 'milkode:search-from-all-packages)
+
+;; *** bundler
+(autoload 'bundle-open "bundler"
+  "Queries for a gem name and opens the location of the gem in dired." t)
+
+(defalias 'find-gem 'bundle-open)
