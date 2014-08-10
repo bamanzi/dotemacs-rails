@@ -119,6 +119,10 @@ which we're looking."
            (if root (file-name-as-directory root))))
    ))
 
+;; *** pry
+(autoload 'run-pry "pry"
+  "Run an inferior Pry process, input and output via buffer *pry*." t)
+
 
 ;; ** robe: Code navigation, documentation lookup and completion for Ruby
 
