@@ -171,19 +171,37 @@ A process is considered alive if its status is `run', `open',
 ;;(add-hook 'ruby-mode-hook 'zossima-mode)
 
 
-
-;; ** rdebug
-;;for ruby > 1.9, install 'debugger' gem
-;;
-;;(add-to-list 'load-path "/usr/lib/ruby/gems/1.9.1/debugger-1.6.0/emacs")
+;; ** debugging
+;; *** ruby-debug https://github.com/denofevil/ruby-debug/tree/master/emacs
 (autoload 'rdebug "rdebug-core"
   "Invoke the rdebug Ruby debugger and start the Emacs user interface." t)
+
 (eval-after-load "rdebug"
   `(progn
     ;;rdebug-core requires package `gdb-ui', but emacs 24 renamed it to gdb-mi
     (unless (locate-library "gdb-ui")
       (require 'gdb-mi)
-      (provide 'gdb-ui))))
+      (provide 'gdb-ui))
+
+    ;; make GUD menu works
+    (add-hook 'rdebug-mode-hook 'rdebug-init-gud-commands)
+    ))
+
+(defun rdebug-init-gud-commands ()
+  (gud-def gud-break  "break %f:%l"  "\C-b" "Set breakpoint at current line.")
+;;  (gud-def gud-remove "clear %f:%l"  "\C-d" "Remove breakpoint at current line")
+  (gud-def gud-step   "step"         "\C-s" "Step one source line with display.")
+  (gud-def gud-next   "next"         "\C-n" "Step one line (skip functions).")
+  (gud-def gud-cont   "continue"     "\C-r" "Continue with display.")
+  (gud-def gud-finish "finish"       "\C-f" "Finish executing current function.")
+  (gud-def gud-up     "up"           "<" "Up one stack frame.")
+  (gud-def gud-down   "down"         ">" "Down one stack frame.")
+  (gud-def gud-print  "p %e"         "\C-p" "Evaluate Ruby expression at point.")
+  ;; Is this right?
+  (gud-def gud-statement "eval %e"      "\C-e" "Execute Ruby statement at point.")
+  )
+
+;; *** realgud https://github.com/rocky/emacs-dbgr
 
 ;; *** helper to show source code when debugging in inf-ruby
 (eval-after-load "inf-ruby"
