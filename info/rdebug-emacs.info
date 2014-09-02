@@ -9,8 +9,8 @@ END-INFO-DIR-ENTRY
 
 File: rdebug-emacs.info,  Node: Top,  Next: Getting started,  Prev: (dir),  Up: (dir)
 
-Debugging with ruby-debug under GNU Emacs
-*****************************************
+Debugging with rdebug in GNU Emacs
+**********************************
 
 * Menu:
 
@@ -44,10 +44,10 @@ Emacs Debugger Commands
 * Emacs Debugger Watch Buffer Commands::
 * Emacs GUD Commands::
 
-   This file describes ruby-debug, the Ruby Debugger, version
-0.1
+   This file describes `rdebug', the Emacs interface to Ruby Debugger,
+`ruby-debug', version 0.1
 
-   This is the 0.1 Edition, 2013
+   This is the 0.10.4 Edition, 16 November 2010
 
    A special interface which comes with Ruby that allows you to use
 GNU Emacs to view (and edit) the source files for the program you are
@@ -63,6 +63,9 @@ debugger windows.(1)
 
    This package comes with a number of predefined window layouts. It is
 fully customizable so you can create your own.
+
+   _A rewrite of this interface is underway. See
+`http://github.com/rocky/emacs-rbdbgr'_
 
    ---------- Footnotes ----------
 
@@ -80,7 +83,7 @@ File: rdebug-emacs.info,  Node: Getting started,  Next: The Multi-window Mode,  
 * Installation::                How to install this package
 * Emacs rdebug::                Invoke the ruby debugger initially
 * Emacs shell tracking mode::   Entering rdebug from an existing shell buffer
-* Configurating this package::  Introducing the configure system
+* Emacs Customization::         Customizing beavior in Emacs
 
 
 File: rdebug-emacs.info,  Node: Installation,  Next: Emacs rdebug,  Prev: Getting started,  Up: Getting started
@@ -88,13 +91,50 @@ File: rdebug-emacs.info,  Node: Installation,  Next: Emacs rdebug,  Prev: Gettin
 1.1 Installation
 ================
 
-To use this interface, load the file `rdebug.el'. This file is a
-light-weight file, basically it only contains a handful of `autoload'
-directives.
+If you want to build the documentation and install Emacs files, you
+need:
 
-   For example, you can place the following in your `~/.emacs' file:
+   * a POSIX shell
 
+   * GNU Make
+
+   * texinfo
+
+   * texi2html
+
+   * GNU Emacs
+
+   Download the ruby-debug-extra tarball from rubyforge
+`http://rubyforge.org/frs/?group_id=1900&release_id=28306'
+
+   For example for the 0.10.3 release:
+
+       wget http://rubyforge.org/frs/download.php/46883/ruby-debug-extra-0.10.3.tar.gz
+
+   Untar this, run configure, make, make check and make install. For
+example:
+
+        $ tar -xpf ruby-debug-extra-0.10.3.tar.gz
+        $ cd ruby-debug-extra-0.10.3
+        $ sh ./configure
+        $ make && make check
+        $ sudo make install  # or as root: make install
+
+   `configure --help' gives customization help.
+
+   Environment variable `EMACS' can be used to find which emacs to use,
+should you need to specify which emacs to use.
+
+   After installing the Emacs code on your computer, to use the
+interface inside Emacs load the file `rdebug.el' as in `M-x
+load-library rdebug'. This file is a light-weight file, basically it
+only contains a handful of `autoload' directives.
+
+   If you want to automatically load this package, you can place the
+either of the following in your `~/.emacs' file:
        (require 'rdebug)
+   or
+       (autoload 'rdebug "rdebug" "ruby-debug interface" t)
 
    In addition, you must have Ruby and ruby-debug installed.
 
@@ -130,7 +170,7 @@ usual way--for example, `C-c C-c' for an interrupt, `C-c C-z' for a
 stop.
 
 
-File: rdebug-emacs.info,  Node: Emacs shell tracking mode,  Next: Configurating this package,  Prev: Emacs rdebug,  Up: Getting started
+File: rdebug-emacs.info,  Node: Emacs shell tracking mode,  Next: Emacs Customization,  Prev: Emacs rdebug,  Up: Getting started
 
 1.3 Entering rdebug from an existing shell buffer
 =================================================
@@ -147,11 +187,19 @@ overhead involved in scanning output, so if you are not debugging Ruby
 programs you probably want to turn this off which can be done via the
 `M-x turn-off-rdebugtrack' command.
 
-
-File: rdebug-emacs.info,  Node: Configurating this package,  Prev: Emacs shell tracking mode,  Up: Getting started
+   This command doesn't set up the various buffers such as tracking
+local variables and the call stack. A more ambitious takeover of the
+shell which does set up these buffers is can be done via `M-x
+rdebug-track-attach'. A name of the program is solicited. This is used
+to make and association between the buffers. After this is done, you
+might not be able to use the shell for anything other than the debug
+session.
 
-1.4 Configurating this package
-==============================
+
+File: rdebug-emacs.info,  Node: Emacs Customization,  Prev: Emacs shell tracking mode,  Up: Getting started
+
+1.4 Emacs Customization
+=======================
 
 In this manual we present a number of GNU Emacs lisp variables and
 functions that you can use to configure the debugger interface. In
@@ -174,18 +222,17 @@ mode.
 +----------------------------------------------------------------------+
 |                                Toolbar                               |
 +-----------------------------------+----------------------------------+
-|                                   |                                  |
-| Debugger shell                    | Variables buffer                 |
-|                                   |                                  |
+| Debugger Stack Buffer             | Local Variables buffer           |
 +-----------------------------------+----------------------------------+
-|                                   |                                  |
-| Source buffer                     | Output buffer                    |
-|                                   |                                  |
-+-----------------------------------+----------------------------------+
-|                                   |                                  |
-| Stack buffer                      | Breakpoints buffer               |
-|                                   |                                  |
-+-----------------------------------+----------------------------------+
+|                                                                      |
+|                           Source buffer                              |
+|                                                                      |
++----------------------------------------------------------------------+
+|                        Debugger Command Buffer                       |
++----------------------------------------------------------------------+
+
+   However there are other layouts available. Look at the "Window
+Layout" drop-down list under the "Debugger" menu in the toolbar.
 
 2.1 Activating Multi-window mode
 ================================
@@ -1034,25 +1081,25 @@ Key Binding Index
 
 Tag Table:
 Node: Top242
-Ref: Top-Footnote-12288
-Node: Getting started2409
-Node: Installation2829
-Node: Emacs rdebug3285
-Node: Emacs shell tracking mode4472
-Node: Configurating this package5281
-Node: The Multi-window Mode5718
-Node: Debugger Buffers13590
-Node: Debugger Command Buffer13855
-Node: Emacs Source21483
-Node: Emacs Debugger Commands24542
-Node: Emacs Debugger Common Commands24957
-Node: Emacs Debugger Breakpoint Buffer Commands28192
-Node: Emacs Debugger Stack Buffer Commands28672
-Node: Emacs Debugger Variable Buffer Commands29090
-Node: Emacs Debugger Watch Buffer Commands29401
-Node: Emacs GUD Commands29940
-Node: Emacs Command Index30931
-Node: Emacs Function Index32651
-Node: Emacs Key Binding Index36886
+Ref: Top-Footnote-12410
+Node: Getting started2531
+Node: Installation2947
+Node: Emacs rdebug4459
+Node: Emacs shell tracking mode5646
+Node: Emacs Customization6866
+Node: The Multi-window Mode7282
+Node: Debugger Buffers14994
+Node: Debugger Command Buffer15259
+Node: Emacs Source22887
+Node: Emacs Debugger Commands25946
+Node: Emacs Debugger Common Commands26361
+Node: Emacs Debugger Breakpoint Buffer Commands29596
+Node: Emacs Debugger Stack Buffer Commands30076
+Node: Emacs Debugger Variable Buffer Commands30494
+Node: Emacs Debugger Watch Buffer Commands30805
+Node: Emacs GUD Commands31344
+Node: Emacs Command Index32335
+Node: Emacs Function Index34055
+Node: Emacs Key Binding Index38290
 
 End Tag Table
