@@ -3,7 +3,7 @@
 ;; Copyright (C) 2008, 2009 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2008 Anders Lindgren
 
-;; $Id: rdebug-locring.el 917 2009-03-31 09:49:37Z rockyb $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

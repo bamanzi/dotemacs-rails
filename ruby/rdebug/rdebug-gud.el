@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007, 2008 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2007, 2008 Anders Lindgren
 
-;; $Id: rdebug-gud.el 821 2008-04-25 02:54:44Z rockyb $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

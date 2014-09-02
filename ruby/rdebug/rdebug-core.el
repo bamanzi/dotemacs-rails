@@ -1,10 +1,10 @@
 ;;; rdebug-core.el --- Core parts of the Ruby debugger user
 ;;; interface. It pulls in other parts of the debugger.
 
-;; Copyright (C) 2006, 2007, 2008 Rocky Bernstein (rocky@gnu.org)
+;; Copyright (C) 2006, 2007, 2008, 2009 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2007, 2008 Anders Lindgren
 
-;; $Id: rdebug-core.el 909 2009-03-11 18:57:08Z rockyb $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -44,7 +44,17 @@
 ;;
 
 (require 'gud)
-(require 'cl)
+(eval-when-compile 
+  (byte-compile-disable-warning 'cl-functions)
+  (condition-case nil 
+      (require 'gdb-ui)
+    (error 
+     (require 'gdb-mi))))
+
+(condition-case nil 
+    (require 'gdb-ui)
+  (error 
+   (require 'gdb-mi)))
 
 (require 'rdebug)
 (require 'rdebug-annotate)

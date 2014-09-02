@@ -4,7 +4,7 @@
 ;; Copyright (C) 2008 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2008 Anders Lindgren
 
-;; $Id: rdebug-shortkey.el 807 2008-04-08 19:55:37Z andersl $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

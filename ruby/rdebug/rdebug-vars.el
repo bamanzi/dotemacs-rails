@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2007 Anders Lindgren
 
-;; $Id: rdebug-vars.el 769 2008-03-17 14:29:40Z rockyb $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

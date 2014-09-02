@@ -3,7 +3,7 @@
 ;; Copyright (C) 2008 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2008 Anders Lindgren
 
-;; $Id: rdebug-output.el 711 2008-02-20 07:09:17Z andersl $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

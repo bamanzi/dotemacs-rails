@@ -1,10 +1,10 @@
 ;;; rdebug-annotate.el --- Ruby debugger output filtering - which
 ;;; includes annotation handling.
 
-;; Copyright (C) 2008 Rocky Bernstein (rocky@gnu.org)
+;; Copyright (C) 2008, 2009 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2008 Anders Lindgren
 
-;; $Id: rdebug-annotate.el 786 2008-04-02 00:50:27Z rockyb $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,7 +29,18 @@
 ;;; Code:
 
 (require 'gud)
-(require 'gdb-ui)
+
+(eval-when-compile
+  (condition-case nil 
+      (require 'gdb-ui)
+    (error 
+     (require 'gdb-mi))))
+
+(condition-case nil 
+    (require 'gdb-ui)
+  (error 
+   (require 'gdb-mi)))
+
 (require 'rdebug-dbg)
 (require 'rdebug-error)
 (require 'rdebug-fns)

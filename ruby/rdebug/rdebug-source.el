@@ -1,9 +1,9 @@
 ;;; rdebug-source.el --- Ruby debugger user interface.
 
-;; Copyright (C) 2006, 2007, 2008 Rocky Bernstein (rocky@gnu.org)
+;; Copyright (C) 2006, 2007, 2008, 2009 Rocky Bernstein (rocky@gnu.org)
 ;; Copyright (C) 2007, 2008 Anders Lindgren
 
-;; $Id: rdebug-source.el 821 2008-04-25 02:54:44Z rockyb $
+;; $Id$
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -43,7 +43,9 @@
 ;; Dependencies.
 ;;
 
-(require 'cl)
+(eval-when-compile 
+  (byte-compile-disable-warning 'cl-functions)
+  (require 'cl))
 
 (require 'gud)                          ; For gud-key-prefix, sigh...
 (require 'rdebug)
