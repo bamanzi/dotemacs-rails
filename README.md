@@ -8,7 +8,8 @@ Tested on GNU Emacs 23.3 & 24.3, Ruby 1.8.7/1.9.3/2.0.0/2.1.2, on Ubuntu Linux 1
 
 ## Package integrated
 
-| Package             | Description                                                                      | Homepage                                                        | melpa | external      |
+| Package             | Description                                                                      | Homepage                                                        | melpa | depends       |
+|---------------------|----------------------------------------------------------------------------------|-----------------------------------------------------------------|-------|---------------|
 | ac-inf-ruby         | Enable auto-complete in inf-ruby sessions                                        | https://github.com/purcell/ac-inf-ruby                          | Y     | auto-complete |
 | anything-rails      | Adds useful anything sources for use with Ruby on Rails development              | https://github.com/wolfmanjm/anything-on-rails                  |       | anything      |
 | bundler             | Interact with Bundler from Emacs                                                 | https://github.com/tobiassvn/bundler.el                         | Y     |               |
@@ -28,6 +29,7 @@ Tested on GNU Emacs 23.3 & 24.3, Ruby 1.8.7/1.9.3/2.0.0/2.1.2, on Ubuntu Linux 1
 | rails-log-mode      | Major mode for viewing Rails log files                                           | https://github.com/ananthakumaran/rails-log-mode                | Y     |               |
 | rhtml-mode          | major mode for editing RHTML files                                               | https://github.com/eschulte/rhtml                               | Y     |               |
 | rainbow-mode        | a minor mode displays color strings with the color they represent as background. | https://julien.danjou.info/projects/emacs-packages#rainbow-mode |       |               |
+| rdebug              | a full-blown debugger user interface to the Ruby rdebug debugger shell           | https://github.com/denofevil/ruby-debug/tree/master/emacs       |       |               |
 | rinari              | Rinari Is Not A Rails IDE                                                        | https://github.com/eschulte/rinari                              | Y     |               |
 | robe                | Code navigation, documentation lookup and completion for Ruby                    | https://github.com/dgutov/robe                                  | Y     |               |
 | rubocop             | An Emacs interface for RuboCop                                                   | https://github.com/bbatsov/rubocop-emacs                        | Y     |               |
@@ -40,12 +42,13 @@ Tested on GNU Emacs 23.3 & 24.3, Ruby 1.8.7/1.9.3/2.0.0/2.1.2, on Ubuntu Linux 1
 
 ### some other packages might be useful (but not included here)
 
-| Package | Description                                                                     | Homepage                                                | melpa |
-| omniref | Emacs interface for Ruby documentation search engine http://www.omniref.com/    | https://github.com/dotemacs/omniref.el                  | Y     |
-| realgud | A modular front-end for interacting with external debuggers (supports `rdebug`) | https://github.com/rocky/emacs-dbgr                     | Y     |
-| rdebug  |                                                                                 | https://github.com/cldwalker/debugger/tree/master/emacs |       |
+| Package    | Description                                                                     | Homepage                               | melpa |
+|------------|---------------------------------------------------------------------------------|----------------------------------------|-------|
+| omniref    | Emacs interface for Ruby documentation search engine http://www.omniref.com/    | https://github.com/dotemacs/omniref.el | Y     |
+| realgud    | A modular front-end for interacting with external debuggers (supports `rdebug`) | https://github.com/rocky/emacs-dbgr    | Y     |
+| projectile | Manage and navigate projects in Emacs easily                                    | https://github.com/bbatsov/projectile  | Y     |
 
-## Usage
+## Installation
 
 `M-x load-file RET /path/to/dotemacs-rails/_init.el RET`
 
@@ -57,12 +60,15 @@ Add this into your dotemacs (`~/.emacs` or `~/.emacs.d/init.el`)
     (load-file "/path/to/dotemacs-rails/_init.el")
 ```
 
-Tested on GNU Emacs 23.3 & 24.3.
+Note: If you don't care about compabilities with emacs-23.x, you can install those 3rd-party
+packages directly from [MELPA](http://melpa.milkbox.net/). (And remember to comment out line 18-25 in `_init.el` which would add
+subdirectory into `load-path`)
 
-
-### Major modes
+## Usage
+### Major Modes
 
 | extension | major mode                 | alternative   |
+|-----------|----------------------------|---------------|
 | .rb       | ruby-mode (emacs built-in) | enh-ruby-mode |
 | .erb      | web-mode                   | rhtml-mode    |
 | .haml     | haml-mode                  |               |
@@ -73,19 +79,21 @@ Tested on GNU Emacs 23.3 & 24.3.
 | .css      | css-mode (emacs built-in)  |               |
 
 To use *alternative* major-mode, you need to activate them manually (`M-x major-mode-name` after
-file opened, or customized `auto-mode-alist` by yourself).
+file opened, or [customized =auto-mode-alist=](http://www.emacswiki.org/emacs/AutoModeAlist) by yourself).
 
 #### enh-ruby-mode
 
 Advantages over built-in `ruby-mode`:
+
  * Dynamic syntax checking
  * `beginning-of-defun` and `end-of-defun` would work (while emacs < 24 would not)
  * `imenu` would work (but emacs < 24 would not)
 
 Note:
+
  * To use `enh-ruby-mode`, `ruby` intepreter must exist in your `PATH`, and it must be >=1.9.2
 
-### Jumping across files
+### Jumping Across Files
 
 For Rails project, `rinari-minor-mode` would be activated for ruby & erb buffers:
 
@@ -115,30 +123,33 @@ Note: use `C-u M-x info RET dotemacs-rails/info/rinari.info` to view info pages 
 
 `bundle-open` wraps `bundle open`, which opens gem according to Gemfile.
 
-### Jumping to class/symbol definition
+### Jumping to Class/Symbol Definition
 
- * method 1: use `ctags` (emacs built-in)
-  * make sure you've installed exuberant ctags (http://ctags.sourceforge.net/). use `ctags
+method 1: use `ctags` (emacs built-in)
+
+ * make sure you've installed exuberant ctags (http://ctags.sourceforge.net/). use `ctags
 --version` to check
-  * run `ctags -R -e .` in your Rails project
-  * call `find-tag` to jump to class/function at point
+ * run `ctags -R -e .` in your Rails project
+ * call `find-tag` to jump to class/function at point
 
 Note: `rinari-minor-mode` would automatically updating your `tags-file-name` variable whenever
 you enter a rails project,
 
- * method 2: use `robe`
-  * Use `M-x rinari-console` or `M-x inf-ruby-console-auto` to launch Rails console
-(for non-Rails project, use `M-x inf-ruby-console-default`)
-  * Call `M-x robe-jump`
+method 2: use `robe`
 
-### code completion
+ * Use `M-x rinari-console` or `M-x inf-ruby-console-auto` to launch Rails console
+(for non-Rails project, use `M-x inf-ruby-console-default`)
+ * Call `M-x robe-jump`
+
+### Code Completion
 
 in ruby source buffer:
+
  * `M-x hippie-expand` is always your friend (zero configuration,
 zero pain)
 
  * `ac-source-robe` (from package `robe`) enables `auto-complete` for
-ruby buffers
+ruby buffers (you need to install `auto-complete` by yourself)
 
 But it seems to make editing too slow, thus disabled by
 default. Use `M-x ruby-mode-enable-ac` to activate it for current
@@ -149,83 +160,156 @@ add `(add-hook 'ruby-mode-hook 'ruby-mode-enable-ac)` to your
 And make sure you've started an `inf-ruby` process (see section
 [console](console) below).
 
-
 in irb shell buffer:
+
  * [ ] `ac-inf-ruby` (but not enabled in this suite as it won't work
 in my machine)
   * [ ] what if you're using `pry` as console (if `ac-inf-ruby`
 works for `irb`)?
 
-### Document lookup
- * `yari` from package `[[https://github.com/hron/yari.el][yari]]`
-  * use `gem rdoc <gemname> [-v <version>]` to generate RDoc/RI
+### Document Lookup
+
+#### `yari` from package [yari](https://github.com/hron/yari.el)
+
+ * use `gem rdoc <gemname> [-v <version>]` to generate RDoc/RI
 documentation (generated files live in `ruby/lib/ruby/gems/1.9.x/doc/gemname-1.x.x/`)
-  * call `M-x yari` to lookup documentaion
+ * call `M-x yari` to lookup documentaion
 
 References:
-  * [Ubuntu Manpage: ri1.9.1 - Ruby Information at your fingertips](http://manpages.ubuntu.com/manpages/trusty/en/man1/ri.1.html)
-  * [Ubuntu Manpage: rdoc1.9.1 - Generate documentation from Ruby script files](http://manpages.ubuntu.com/manpages/trusty/en/man1/rdoc.1.html)
-  * [用好ri，轻松查阅ruby/rails文档 - 杨波的专栏](http://blog.csdn.net/yangbo_hr/article/details/2026216)
 
- * If you're using **pry** as console in emacs (see below [pry-console-in-emacs](pry-console-in-emacs))
-  * `ri` command in **pry** console
-  * `show-doc` command in **pry** console
+ * [Ubuntu Manpage: ri1.9.1 - Ruby Information at your fingertips](http://manpages.ubuntu.com/manpages/trusty/en/man1/ri.1.html)
+ * [Ubuntu Manpage: rdoc1.9.1 - Generate documentation from Ruby script files](http://manpages.ubuntu.com/manpages/trusty/en/man1/rdoc.1.html)
+ * [用好ri，轻松查阅ruby/rails文档 - 杨波的专栏](http://blog.csdn.net/yangbo_hr/article/details/2026216)
+
+#### If you've started a console, the following features from `robe` would be available:
+
+ * `M-x robe-doc`: Show docstring for the method at point.
+ * `eldoc` would make use of `robe` if minor mode `robe-mode` activated
+
+#### Looking up documentation in **pry** console running inside emacs (see below [pry-console-in-emacs](pry-console-in-emacs))
+
+ * `ri` command in pry console
+ * `show-doc` command in pry console
 
 References:
-  * [Documentation browsing · pry/pry Wiki · GitHub](https://github.com/pry/pry/wiki/Documentation-browsing)
 
-### Syntax checking
+ * [Documentation browsing · pry/pry Wiki · GitHub](https://github.com/pry/pry/wiki/Documentation-browsing)
+
+### Syntax Checking
 
 For ruby source code:
- * enh-ruby-mode
- * flymake-ruby
- * rubocop
+
+ * If you're using `enh-ruby-mode` as major mode for ruby source file, it would check syntax
+dynamically and highlight the errors
+ * Use `M-x compile RET ruby -w -c <filename.rb>`
+ * Use `M-x flymake-ruby`
+ * Use `M-x rubocop-check-current-file` (you need to install gem `rubocop`)
 
 ### Debugging
- * method 1: use package `rdebug` in `debugger` gem
-(https://github.com/cldwalker/debugger/tree/master/emacs )
+#### use rdebug emacs package from 'ruby-debug' gem + GUD multi-window UI
 
-Note: on emacs 24, you should change `require 'gud-ui` to `require 'gui-mi`.
+Installation:
 
-steps:
-  * abc
-  * def
-  * ghi
+ * install ruby debugger
 
- * method 2: use package `realgud` (https://github.com/rocky/emacs-dbgr)
+    * for ruby 1.8.x: `gem install ruby-debug`
+    * for ruby 1.9.x: `gem install debugger`
+    * for ruby 2.x: `gem install byebug`
 
-steps:
-  * abc
-  * def
-  * ghi
+ * install emacs package from: https://github.com/denofevil/ruby-debug/tree/master/emacs
 
-### Console
+Steps:
 
- * For Rails project, you can use
-  * `M-x rinari-console` from package `[[https://github.com/eschulte/rinari%20][rinari]]`
-  * `M-x projectile-rails-console` from package `[[https://github.com/asok/projectile-rails][projectile-rails]]`
-(but you need to install `[[https://github.com/bbatsov/projectile][projectile]]` by yourself, as it is not
+ * optional: add debugger statement into your source code
+
+    * for rubyg 1.8 + ruby-debug gem: add `require 'ruby-debug' ; Debugger.start`
+on the file header and `debugger` to the line you want the debugger to stop
+    * for ruby 1.9 + debugger gem: add `require "debugger"; debugger`
+    * for ruby 2.x + byebug gem: you just need to insert `byebug`
+
+ * in emacs's shell buffer or eshell buffer, cd to your Rails project's root folder
+(this means to make your current working directory is correct . For Rails project,
+you should start the server/console/rake from the project root folder).
+
+ * type `M-x rdebug RET rdebug --emacs=3 script/rails -- server RET`.
+GUD multi-windows UI would show up.
+
+ * now you can type commands such as `break <file>:<line>`, `next`, `step`,
+`continue` into debug the program (type `help` for help on commands)
+
+Advantages:
+
+ * GUD multi-windows //(info "(emacs) GDB-UI Layout")
+ * easy to customization (compared to [realgud])
+
+Disadvantages:
+
+ * not updated for 5 years, thus not fully compatible with Emacs 23/24
+(e.g. rdebug-track-mode not work in shell buffer)
+
+Tips:
+
+ * Use `C-u M-x info RET <dotemacs-rails-dir>/info/rdebug-emacs.info RET` to view the documentaion
+ * (not work yet?) Use `M-x turn-on-rdebug-track-mode` in shell/eshell buffer to ...
+
+#### method 2: use package realgud (https://github.com/rocky/emacs-dbgr)
+
+Advantages:
+
+ * `realgud` supports multiple debuggers, including `gdb`, `ruby-debug`, `pdb` (python),
+`perldb`, `bashdb` etc. (refer [Debuggers Supported · rocky/emacs-dbgr Wiki](https://github.com/rocky/emacs-dbgr/wiki/Debuggers-Supported))
+ * `realgud-track-mode` allows your [attach to an existing debugger session in a comint-shell](https://github.com/rocky/emacs-dbgr/wiki/Features#attaching-to-an-existing-debugger-session-in-a-comint-shell)
+ * it is actively maintained
+
+Installation:
+refer [How to Install · rocky/emacs-dbgr Wiki · GitHub](https://github.com/rocky/emacs-dbgr/wiki/how-to-install)
+
+or install it manually:
+
+```sh
+  mkdir ~/.emacs.d/packages
+  cd ~/temp
+  wget -c https://github.com/rocky/emacs-dbgr/archive/master.zip -O realgud-master.zip
+  unzip realgud-master.zip
+  cp -a emacs-dbgr-master/realgud ~/.emacs.d/packages/
+  cp emacs-dbgr-master/realgud.el ~/.emacs.d/packages/realgud/
+  cd ~/.emacs.d/packages/realgud
+  wget -c https://github.com/rocky/emacs-test-simple/raw/master/test-simple.el
+  wget -c https://github.com/rocky/emacs-load-relative/raw/master/load-relative.el
+  wget -c https://github.com/rocky/emacs-loc-changes/raw/master/loc-changes.el
+  echo "(add-to-list 'load-path \"~/.emacs.d/packages/realgud\")" >> ~/.emacs.d/init.el
+  echo '(load-library "realgud")' >> ~/.emacs.d/init.el
+```
+
+### Console (repl/shell/comint)
+
+For Rails projects, you can use:
+
+ * `M-x rinari-console` from package [rinari](https://github.com/eschulte/rinari%20)
+ * `M-x projectile-rails-console` from package [projectile-rails](https://github.com/asok/projectile-rails)
+(but you need to install [projectile](https://github.com/bbatsov/projectile) by yourself, as it is not
 include in this suite)
 
- * `inf-ruby-console-auto` from package `[[https://github.com/nonsequitur/inf-ruby][inf-ruby]]` is recommended
-for non-rails project or gem source
-  * `M-x inf-ruby-console-rails` runs `rails console` for rails project
-  * `M-x inf-ruby-console-default` runs `bundle console` for
+For projects of other type, you can always use `inf-ruby-console-auto` from package [inf-ruby](https://github.com/nonsequitur/inf-ruby)
+
+ * `M-x inf-ruby-console-rails` runs `rails console` for rails project
+ * `M-x inf-ruby-console-default` runs `bundle console` for
 bundler-enabled project
-  * `M-x inf-ruby-console-gem` runs `bundle exec irb` (if Gemfile
+ * `M-x inf-ruby-console-gem` runs `bundle exec irb` (if Gemfile
 exists) or `irb -I lib`
-  * `M-x inf-ruby-console-auto` automatically choose above 3 methods
+ * `M-x inf-ruby-console-auto` automatically choose above 3 methods
 
 #### Using `pry` as console in emacs
 https://github.com/pry/pry
 
-`run-pry` from package `[[http://http://github.com/jacott/emacs-pry][pry]]` :: `M-x run-pry`
+`run-pry` from package [pry](http://http://github.com/jacott/emacs-pry) :: `M-x run-pry`
 
- * if you've add `[[https://github.com/rweng/pry-rails][pry-rails]]` into your Gemfile, then (after `bundle
+ * if you've add [pry-rails](https://github.com/rweng/pry-rails) into your Gemfile, then (after `bundle
 install` finished ) `rinari-console` or `inf-ruby-console-rails` would be powered
 by **pry**
 
 Some notes for emacs:
+
  * [Why is my emacs shell output showing odd characters?](https://github.com/pry/pry/wiki/FAQ#why-is-my-emacs-shell-output-showing-odd-characters)
  * [It may be necessary to turn paging off if you are running Pry from
 within an emacs shell or similar.](https://github.com/pry/pry/wiki/Customization-and-configuration#pager)
@@ -252,11 +336,14 @@ within an emacs shell or similar.](https://github.com/pry/pry/wiki/Customization
 ```
 
 
-### Database
+### Database Console
 
-`rinari-sql`
+Command `rinari-sql` from package `rinari` wraps Emacs's built-in
+`sql-mysql/sql-sqlite/sql-postgresql`. The difference is that it would try to read
+`config/database.yml` from your Rails project and guess the parameters `sql-database`, `sql-user`
+etc. But sometimes it doesn't work well.
 
-### View logs
+### View Logs
 
 As log files could be very big, it is not a good idea to open it
 directly into Emacs. You can use the following ways:
@@ -272,10 +359,51 @@ the file paths in the log are navigatable, thus you can press
 projectile-rails-find-log` . It allow you find a log file and
 enable `auto-revert-tail-mode` in its buffer.
 
-## Other tips
-### debugging php
+## Other tips for web development
+### debugging php with geben
+
+**GEBEN** is a software package that interfaces Emacs to [DBGp protocol](http://xdebug.org/docs-dbgp.php) with which you can debug
+running scripts interactively. At this present DBGp protocol are supported in several script
+languages with help of custom extensions.
+
+http://code.google.com/p/geben-on-emacs/
+
+steps:
+
+ * install xdebug extension on your php server: http://xdebug.org/docs/install
+ * type `M-x geben RET` on Emacs to start the debugger on port 9000
+ * when requesting from web browser, remember to activate `xdebug` with adding
+`XDEBUG_SESSION_START=session_name` parameter to the URL (or with some web browser extensions
+(refer to http://xdebug.org/docs/remote#starting for detailed info)
+ * geben would display the script being debugged on Emacs
+
 ### http status / http header
-### css rainbow
+package `know-your-http-well` provides the following commands to consult http related info:
+
+ * `M-x http-header`
+ * `M-x http-method`
+ * `M-x http-relation`
+ * `M-x http-status-code`
+ * `M-x http-status-code`
+
 ### css property
+package `know-your-css-well` provides the following commands:
+
+ * `M-x css-property`
+
+### rainbow-mode highlight color names in css files
+
+Package `rainbow-mode` provides a minor mode `rainbow-mode`, which sets background color to strings
+that match color names, e.g. `#0000ff` is displayed in white with a blue background.
+
 ### jquery-doc
-### milkode
+
+Package `jquery-doc` provides:
+
+ * completion source for [auto-complete](http://auto-complete.org) and [company-mode](http://company-mode.github.io/)
+ * a command `jquery-doc` to lookup the documentation for a
+method in jquery
+
+
+## other tips
+### use milkode to build a big code database for searching
