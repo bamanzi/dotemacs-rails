@@ -16,6 +16,9 @@
 (autoload 'rinari-console "rinari"
   "Run a Rails console in a compilation buffer." t)
 
+(autoload 'rinari-sql "rinari"
+  "Browse the application's database." t)
+
 (eval-after-load "ruby-mode"
   `(progn
      (add-hook 'ruby-mode-hook 'rinari-launch)))
@@ -37,6 +40,15 @@
   `(progn
      (define-key rinari-minor-mode-map (kbd "C-c .") 'robe-jump)
      ))
+
+(defun rinari.info ()
+  "Open Info reader to read rinari.info"
+  (interactive)
+  (let ((filepath (expand-file-name "info/rinari.info"
+                                    (if (boundp 'dotemacs-rails-dir)
+                                        dotemacs-rails-dir
+                                      default-directory))))
+    (info filepath)))
 
 ;; ** projectile-rails: a replacement for rinari
 ;; https://github.com/asok/projectile-rails
