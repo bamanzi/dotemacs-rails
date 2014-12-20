@@ -268,3 +268,6 @@ A process is considered alive if its status is `run', `open',
   "Queries for a gem name and opens the location of the gem in dired." t)
 
 (defalias 'find-gem 'bundle-open)
+
+(autoload 'anything-rubygems-local "anything-rubygems-local"
+  "Undocumented." t)
