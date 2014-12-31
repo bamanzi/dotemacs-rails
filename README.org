@@ -145,7 +145,7 @@ method 2: use =robe=
 
 *** Code Completion
 
-in ruby source buffer:
+**** in ruby source buffer:
 
   - ~M-x hippie-expand~ is always your friend (zero configuration,
     zero pain)
@@ -153,6 +153,7 @@ in ruby source buffer:
   - =ac-source-robe= (from package =robe=) enables =auto-complete= for
     ruby buffers (you need to install =auto-complete= by yourself)
 
+#+begin_quote
     But it seems to make editing too slow, thus disabled by
     default. Use ~M-x ruby-mode-enable-ac~ to activate it for current
     buffer. (If you want to activate it each time a ruby buffer opens,
@@ -161,8 +162,9 @@ in ruby source buffer:
 
     And make sure you've started an =inf-ruby= process (see section
     [[console]] below).
+#+end_quote
 
-in irb shell buffer:
+**** in irb shell buffer:
 
   - [ ] =ac-inf-ruby= (but not enabled in this suite as it won't work
     in my machine)
@@ -411,3 +413,8 @@ Package =jquery-doc= provides:
 
 ** other tips
 *** use milkode to build a big code database for searching
+
+** TODO
+  - add sass-mode
+  - add rdoc-mode, textile-mode
+  - remove ruby-debug.el (as it is useless)

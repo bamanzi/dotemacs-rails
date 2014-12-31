@@ -232,6 +232,9 @@ A process is considered alive if its status is `run', `open',
 ;; *** rake
 (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
 
+(autoload 'rake "rake"
+  "Runs rake command." t)
+
 ;; *** ruby-tools: string/symbol conversion
 (eval-after-load "ruby-mode"
   `(progn
@@ -267,7 +270,10 @@ A process is considered alive if its status is `run', `open',
 (autoload 'bundle-open "bundler"
   "Queries for a gem name and opens the location of the gem in dired." t)
 
-(defalias 'find-gem 'bundle-open)
+;;(defalias 'find-gem 'bundle-open)
 
 (autoload 'anything-rubygems-local "anything-rubygems-local"
   "Undocumented." t)
+
+(defalias 'find-gem 'anything-rubygems-local)
+
