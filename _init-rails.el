@@ -1,5 +1,5 @@
-;; * ruby on rails
-;; ** rhtml-mode for editing html template
+;; * common package for ruby web development
+;; ** rhtml-mode
 (autoload 'rhtml-mode "rhtml-mode"
   "Embedded Ruby Mode (RHTML)" t)
 
@@ -7,7 +7,22 @@
 ;;(add-to-list 'auto-mode-alist '("\\.rhtml\\'" . rhtml-mode))
 ;;(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 
+;; ** yaml-mode
+(autoload 'yaml-mode  "yaml-mode"
+  "Simple mode to edit YAML." t)
 
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
+
+;; * sinatra
+(autoload 'sinatra-rake "sinatra"
+  "Tab completion selection of a rake task to execute with the" t)
+(autoload 'sinatra-console "sinatra"
+  "Run script/console in a compilation buffer, with command" t)
+(autoload 'sinatra-web-server "sinatra"
+  "Run script/server.  Dump output to a compilation buffer" t)
+
+;; * ruby on rails
 ;; ** rinari: rails code navigation & utils
 ;;http://rinari.rubyforge.org/
 (autoload 'rinari-launch "rinari"
@@ -68,11 +83,6 @@
   "Open Rails log with auto-revert-mode on." t)
 
 
-;; ** yaml-mode
-(autoload 'yaml-mode  "yaml-mode"
-  "Simple mode to edit YAML." t)
-
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
 ;; ** anything-rails
 (defun anything-rails-files ()
