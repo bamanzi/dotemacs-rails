@@ -39,7 +39,7 @@
   (add-to-list 'load-path this-dir)
   (add-to-list 'load-path util-dir))
 ;;;###end-elpa-ignore
-(require 'mumamo)
+(require 'mumamo nil t)
 (require 'ruby-mode)
 (require 'inf-ruby)
 (require 'ruby-compilation)
@@ -109,18 +109,20 @@ With optional prefix argument just run `rgrep'."
 ;;--------------------------------------------------------------------
 ;; MuMaMo support
 ;;
-;; 
-(defun mumamo-chunk-sinatra (pos min max)
-  "Use `haml-mode' for everything following __END__"
-  (mumamo-quick-static-chunk pos min max "__END__" "-#end-of-file" nil 'haml-mode nil))
+;;
+(when (featurep 'mumamo)
+  (defun mumamo-chunk-sinatra (pos min max)
+    "Use `haml-mode' for everything following __END__"
+    (mumamo-quick-static-chunk pos min max "__END__" "-#end-of-file" nil 'haml-mode nil))
 
 ;;;###autoload
-(define-mumamo-multi-major-mode sinatra-mode
-  "Major mode for sinatra."
-  ("Sinatra" ruby-mode (mumamo-chunk-sinatra)))
+  (define-mumamo-multi-major-mode sinatra-mode
+    "Major mode for sinatra."
+    ("Sinatra" ruby-mode (mumamo-chunk-sinatra)))
 
-(add-hook 'mumamo-after-change-major-mode-hook
-          (lambda () (if (eq mumamo-multi-major-mode 'sinatra-mode) (sinatra-minor-mode t))))
+  (add-hook 'mumamo-after-change-major-mode-hook
+            (lambda () (if (eq mumamo-multi-major-mode 'sinatra-mode) (sinatra-minor-mode t))))
+  )
 
 ;;--------------------------------------------------------------------
 ;; minor mode and keymaps
