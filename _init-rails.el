@@ -7,6 +7,12 @@
 ;;(add-to-list 'auto-mode-alist '("\\.rhtml\\'" . rhtml-mode))
 ;;(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 
+;; ** haml-mode
+(autoload 'haml-mode "haml-mode"
+  "Major mode for editing Haml files." t)
+
+(add-to-list 'auto-mode-alist '("\\.haml\\'" . haml-mode))
+
 ;; ** yaml-mode
 (autoload 'yaml-mode  "yaml-mode"
   "Simple mode to edit YAML." t)
@@ -21,6 +27,19 @@
   "Run script/console in a compilation buffer, with command" t)
 (autoload 'sinatra-web-server "sinatra"
   "Run script/server.  Dump output to a compilation buffer" t)
+
+;; * padrino
+;; ** inf-ruby support
+(eval-after-load "info-ruby"
+  `(progn
+     (add-to-list 'inf-ruby-console-patterns-alist '("config/apps.rb" . padrino))
+    ))
+
+(defun inf-ruby-console-padrino (dir)
+  "Run Padino console in DIR."
+  (interactive "D")
+  (let ((default-directory dir))
+    (run-ruby "padrino console" "padrino")))
 
 ;; * ruby on rails
 ;; ** rinari: rails code navigation & utils
