@@ -277,3 +277,10 @@ A process is considered alive if its status is `run', `open',
 
 (defalias 'find-gem 'anything-rubygems-local)
 
+;; *** anything
+(eval-after-load "anything-config"
+  `(progn
+     (add-to-list 'anything-c-ctags-modes 'ruby-mode)
+     (add-to-list 'anything-c-ctags-modes 'enh-ruby-mode)
+     (add-to-list 'anything-c-ctags-modes 'js-mode)
+     ))
