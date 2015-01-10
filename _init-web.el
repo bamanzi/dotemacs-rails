@@ -89,3 +89,27 @@
 
 (autoload 'css-property "know-your-css-well"
   "Undocumented." t) 
+
+;; *** restclient
+(autoload 'restclient-mode "restclient"
+  "Major-mode." t)
+
+(add-to-list 'auto-mode-alist '("\\.restclient$" . restclient-mode))
+
+; from json.el of emacs-24.4
+(defun json-pretty-print-buffer ()
+  "Pretty-print current buffer."
+  (interactive)
+  (json-pretty-print (point-min) (point-max)))
+
+;; (defun json-pretty-print (begin end)
+;;   "Pretty-print selected region."
+;;   (interactive "r")
+;;   (atomic-change-group
+;;     (let ((json-encoding-pretty-print t)
+;;           (txt (delete-and-extract-region begin end)))
+;;       (insert (json-encode (json-read-from-string txt))))))
+
+;; a better implementation
+(defun json-pretty-print (begin end)
+  (shell-command-on-region begin end "python -mjson.tool" nil 'replace))
