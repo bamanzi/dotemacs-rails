@@ -170,6 +170,16 @@ A process is considered alive if its status is `run', `open',
   "Improved navigation for Ruby" t)
 ;;(add-hook 'ruby-mode-hook 'zossima-mode)
 
+;; ** documentation lookup
+(autoload 'yari-anything "yari"
+  "Undocumented." t)
+
+(define-key ruby-mode-map (kbd "C-c <f1>") 'yari-anything)
+
+(eval-after-load "enh-ruby-mode"
+  `(progn
+     (define-key enh-ruby-mode-map (kbd "C-c <f1>") 'yari-anything)
+     ))
 
 ;; ** debugging
 ;; *** ruby-debug https://github.com/denofevil/ruby-debug/tree/master/emacs
