@@ -4,7 +4,8 @@
 
 ;; Author: Eric Schulte
 ;; URL: http://github.com/eschulte/jump.el/tree/master
-;; Version: DEV
+;; Version: 2.3
+;; X-Original-Version: DEV
 ;; Created: 2008-08-21
 ;; Keywords: project, convenience, navigation
 ;; Package-Requires: ((findr "0.7") (inflections "1.1"))
@@ -105,13 +106,19 @@ buffer."
 
 (defun jump-select-and-find-file (files)
   "Select a single file from an alist of file names and paths.
-Return the path selected or nil if files was empty."
+Return the path selected or nil if FILES was empty."
   (let ((file   (case (length files)
 		  (0 nil)
 		  (1 (caar files))
 		  (t (jump-completing-read "Jump to: "
-					   (mapcar 'car files))))))
-    (if file (find-file (cdr (assoc file files))))))
+					   (mapcar 'car files)
+                                           nil
+                                           t)))))
+    (when file
+      (let ((path (cdr (assoc file files))))
+        (if path
+            (find-file path)
+          (error "No such file: %s" file))))))
 
 (defun jump-remove-unwanted-files (files)
   "Remove file matching `jump-ignore-file-regexp' from the list
