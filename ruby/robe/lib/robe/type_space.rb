@@ -32,7 +32,17 @@ module Robe
       end
 
       scanner.scan(modules, instance, !instance)
-      scanner.scan(obj.singleton_class.ancestors, true, false) unless instance
+
+      unless instance
+        singleton_ancestors = obj.singleton_class.ancestors
+
+        if RUBY_VERSION >= "2.1.0"
+          # Ruby 2.1 includes all singletons in the ancestors chain
+          singleton_ancestors.reject!(&:singleton_class?)
+        end
+
+        scanner.scan(singleton_ancestors, true, false)
+      end
     end
 
     private

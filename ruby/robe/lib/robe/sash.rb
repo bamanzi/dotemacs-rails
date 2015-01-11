@@ -32,9 +32,7 @@ module Robe
     end
 
     def modules
-      res = visor.each_object(Module).map { |c| c.name rescue nil }
-      res.compact!
-      res
+      visor.each_object(Module).map(&:__name__).compact
     end
 
     def targets(obj)
@@ -44,7 +42,7 @@ module Robe
         instance_methods = (obj.instance_methods +
                             obj.private_instance_methods(false))
           .map { |m| method_spec(obj.instance_method(m)) }
-        [obj.name] + module_methods + instance_methods
+        [obj.__name__] + module_methods + instance_methods
       else
         self.targets(obj.class.to_s)
       end
@@ -63,21 +61,31 @@ module Robe
 
     def method_spec(method)
       owner, inst = method.owner, nil
-      if Class == owner || owner.ancestors.first == owner
-        inst = true
-        name = method_owner_name(owner)
+      if !owner.__singleton_class__?
+        name, inst = method_owner_and_inst(owner)
       else
         name = owner.to_s[/Class:([A-Z][^\(>]*)/, 1] # defined in an eigenclass
       end
       [name, inst, method.name, method.parameters] + method.source_location.to_a
     end
 
-    def method_owner_name(owner)
-      owner.name or
+    def method_owner_and_inst(owner)
+      if owner.__name__
+        [owner.__name__, true]
+      else
         unless owner.is_a?(Class)
-          klass = ObjectSpace.each_object(Class).find { |c| c.include?(owner) }
-          klass && klass.name
+          mod, inst = nil, true
+          ObjectSpace.each_object(Module) do |m|
+            if m.__include__?(owner) && m.__name__
+              mod = m
+            elsif m.__singleton_class__.__include__?(owner)
+              mod = m
+              inst = nil
+            end && break
+          end
+          [mod && mod.__name__, inst]
         end
+      end
     end
 
     def doc_for(mod, type, sym)
@@ -178,5 +186,27 @@ module Robe
         Visor.new
       end
     end
+  end
+end
+
+class Module
+  unless method_defined?(:__name__)
+    alias_method :__name__, :name
+  end
+
+  if method_defined?(:singleton_class?)
+    alias_method :__singleton_class__?, :singleton_class?
+  else
+    def __singleton_class__?
+      self != Class && ancestors.first != self
+    end
+  end
+
+  unless method_defined?(:__singleton_class__)
+    alias_method :__singleton_class__, :singleton_class
+  end
+
+  unless method_defined?(:__include__?)
+    alias_method :__include__?, :include?
   end
 end
