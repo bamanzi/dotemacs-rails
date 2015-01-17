@@ -1,5 +1,14 @@
 ;; * ruby
 ;; ** major mode
+;; *** ruby-mode
+(progn
+  ;; file associations
+  (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
+  (add-to-list 'auto-mode-alist '("Gemfile$" . ruby-mode))
+  )
+
+;; *** enh-ruby-mode
+;; ruby > 1.9.1 required
 (autoload 'enh-ruby-mode  "enh-ruby-mode"
   "Enhanced Major mode for editing Ruby code." t)
 
@@ -77,7 +86,10 @@
      (t
       (message "how to activate inf-ruby?")))))
 
-(add-hook 'ruby-mode-hook 'ruby-mode-init-inf-ruby)
+(eval-after-load "ruby-mode"
+  `(progn
+     (add-hook 'ruby-mode-hook 'ruby-mode-init-inf-ruby)
+     ))
 
 (eval-after-load "inf-ruby"
   `(if (< emacs-major-version 24)
