@@ -1,13 +1,16 @@
 ;;; anything-rubygems-local.el --- Installed local rubygems find-file for anything
 
-;; This package is `helm-rubygems-local' ported to `anything'
-
+;; This package is derived from `helm-rubygems-local':
+;; {{
 ;; Copyright (C) 2013 by hadashiA
 ;; Author: hadashiA <dev@hadashikick.jp>
 ;; URL: https://github.com/f-kubotar/helm-rubygems-local
 ;; Version: 20130711.1811
 ;; X-Original-Version: 0.0.1
-;; Package-Requires: ((anything "0.1"))
+;; }
+;; URL: http://github.com/bamanzi/anything-rubygems-local
+;; Maintainer: Ba Manzi <bamanzi@gmail.com>
+;; Package-Requires: ((anything "1.3.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -46,9 +49,10 @@
                                   nil
                                   (anything-candidate-buffer 'local)))))
 
-(defun anything-c-rubygems-local-action (choice) 
-  ;; (message (anything-attr 'gem-command))
-  (let* ((gem-name (replace-regexp-in-string "\s+(.+)$" "" choice))
+(defun anything-c-rubygems-local-action (choice)
+  (let* ((gem-name  (if (string-match "[\s\*]*\\([a-z0-9\._-]+\\)\s.+" choice)
+                        (match-string 1 choice)
+                      choice))         
          (gem-which (shell-command-to-string
                     (format "%s %s"
                             (if (string= (anything-attr 'gem-command) "gem")
