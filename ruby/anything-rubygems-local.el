@@ -53,19 +53,22 @@
   (let* ((gem-name  (if (string-match "[\s\*]*\\([a-z0-9\._-]+\\)\s.+" choice)
                         (match-string 1 choice)
                       choice))         
-         (gem-which (shell-command-to-string
-                    (format "%s %s"
-                            (if (string= (anything-attr 'gem-command) "gem")
-                                "gem which"
-                              "bundle show")
-                            gem-name)))
+         (gem-which (replace-regexp-in-string "\n$" ""
+                                              (shell-command-to-string
+                                               (format "%s %s"
+                                                       (if (string= (anything-attr 'gem-command) "gem")
+                                                           "gem which"
+                                                         "bundle show")
+                                                       gem-name))))
          (path))
     (message "open gem '%s': %s" gem-name gem-which)
     (if (or (null gem-which)
             (string= "" gem-which)
             (string-match "^ERROR:" gem-which))
         (message "Can't find ruby library file or shared library %s" gem-name)
-      (setq path (file-name-directory gem-which))
+      (setq path (if (string= (anything-attr 'gem-command) "gem")
+                     (file-name-directory gem-which)
+                   gem-which))  ;;`bundle show gem` returns folder, while `gem which` return rb path
       (if (and path (file-exists-p path))
           (find-file path)
         (message "no such file or directory: \"%s\"" path))
