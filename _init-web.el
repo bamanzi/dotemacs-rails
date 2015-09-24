@@ -65,7 +65,9 @@
 (eval-after-load 'js2-mode
   '(progn
      (if (require 'js2-imenu-extras nil t)
-	 (js2-imenu-extras-setup))))
+         (js2-imenu-extras-setup)
+       (message "WARN: failed to load package `js2-imenu-extras'."))
+     ))
 
 ;; *** jquery-doc
 (autoload 'jquery-doc "jquery-doc"
@@ -73,8 +75,17 @@
 
 
 ;; ** css
+;; *** rainbow-mode: minor mode highlighting color values
 (autoload 'rainbow-mode "rainbow-mode"
   "Colorize strings that represent colors." t)
+
+;; *** css-eldoc
+(eval-after-load "css-mode"
+  `(if (require 'css-eldoc nil t)     
+       (add-hook 'css-mode-hook 'css-eldoc-enable)
+     (message "WARN: failed to load `css-eldoc' package"))
+  )
+
 
 ;; ** misc
 ;; *** know-your-http-well
