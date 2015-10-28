@@ -192,7 +192,10 @@ A process is considered alive if its status is `run', `open',
 (autoload 'yari-anything "yari"
   "Undocumented." t)
 
-(define-key ruby-mode-map (kbd "C-c <f1>") 'yari-anything)
+(eval-after-load "ruby"
+  `(progn
+     (define-key ruby-mode-map (kbd "C-c <f1>") 'yari-anything)
+     ))
 
 (eval-after-load "enh-ruby-mode"
   `(progn
