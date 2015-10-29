@@ -1,11 +1,27 @@
 ;; * ruby
 ;; ** major mode
+(defun ruby-set-major-mode (mode)
+  (interactive (list
+                (intern (completing-read "Associate ruby files to major mode: "
+                                         '("ruby-mode" "enh-ruby-mode")
+                                         nil
+                                         'match))))
+  (mapc #'(lambda (ext)
+            (let ((pair (assoc ext auto-mode-alist)))
+              (if pair
+                  (setcdr pair mode)
+                (add-to-list 'auto-mode-alist ,'(ext . mode)))))
+        '("\\.rb\\'"                    ; enh-ruby-mode would set this
+          "Rakefile\\'"                 ; enh-ruby-mode would set this
+          "\\.gemspec\\'"               ; enh-ruby-mode would set this
+          "\\.rake\\'"
+          "Gemfile\\'"
+          "\\.ru\\'"
+          "Vagrantfile\\'"))
+  (message "Ruby files now associated to major mode `%s'. Call `M-x ruby-set-major-mode` to change it." mode))
+
 ;; *** ruby-mode
-(progn
-  ;; file associations
-  (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
-  (add-to-list 'auto-mode-alist '("Gemfile$" . ruby-mode))
-  )
+(ruby-set-major-mode 'ruby-mode)
 
 ;; *** enh-ruby-mode
 ;; ruby > 1.9.1 required
@@ -20,8 +36,7 @@
            ruby-mode-hook)
 
      ;; file associations
-     (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
-     (add-to-list 'auto-mode-alist '("\\.rake$" . enh-ruby-mode))
+     (ruby-set-major-mode 'enh-ruby-mode)
      ))
 
 ;; ** code folding
