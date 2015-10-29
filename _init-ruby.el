@@ -156,6 +156,10 @@ which we're looking."
 (autoload 'run-pry "pry"
   "Run an inferior Pry process, input and output via buffer *pry*." t)
 
+(defun pry ()
+  "A simple pry REPL."
+  (interactive)
+  (inf-ruby "pry"))
 
 ;; ** robe: Code navigation, documentation lookup and completion for Ruby
 
