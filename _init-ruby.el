@@ -27,6 +27,8 @@
 ;; *** ruby-mode
 (ruby-set-major-mode 'ruby-mode)
 
+(setq ruby-deep-indent-paren t)
+
 ;; *** enh-ruby-mode
 ;; ruby > 1.9.1 required
 (autoload 'enh-ruby-mode  "enh-ruby-mode"
@@ -74,7 +76,7 @@
   `(progn
      (require 'hideshow)
 
-     (let ((settings '("\\<\\(def\\|class\\|module\\|begin\\|do\\)\\>"
+     (let ((settings '("\\<\\(def\\|class\\|module\\|begin\\|if\\|unless\\|do\\)\\>"
                        "end"
                        "#"
                        (lambda (arg) (enh-ruby-end-of-block))
@@ -82,7 +84,7 @@
                        )))
        (if (assoc 'enh-ruby-mode hs-special-modes-alist)
            (setcdr (assoc 'enh-ruby-mode hs-special-modes-alist) settings)
-      (add-to-list 'hs-special-modes-alist (cons 'enh-ruby-mode settings))))  
+         (add-to-list 'hs-special-modes-alist (cons 'enh-ruby-mode settings))))  
      ))
   
 

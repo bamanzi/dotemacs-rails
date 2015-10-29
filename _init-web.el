@@ -129,4 +129,5 @@
 
 ;; a better implementation
 (defun json-pretty-print (begin end)
+  (interactive "r")
   (shell-command-on-region begin end "python -mjson.tool" nil 'replace))

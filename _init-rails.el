@@ -55,19 +55,23 @@
 
 (eval-after-load "ruby-mode"
   `(progn
-     (add-hook 'ruby-mode-hook 'rinari-launch)))
+     (add-hook 'ruby-mode-hook 'rinari-launch 'append)))
 
 (eval-after-load "web-mode"
   `(progn
-     (add-hook 'web-mode-hook 'rinari-launch)))
+     (add-hook 'web-mode-hook 'rinari-launch  'append)))
+
+(eval-after-load "haml-mode"
+  `(progn
+     (add-hook 'haml-mode-hook 'rinari-launch 'append)))
 
 (eval-after-load "rhtml-mode"
   `(progn
-     (add-hook 'rhtml-mode-hook 'rinari-launch)))
+     (add-hook 'rhtml-mode-hook 'rinari-launch 'append)))
 
 (eval-after-load "yaml-mode"
   `(progn
-     (add-hook 'yaml-mode-hook 'rinari-launch)))
+     (add-hook 'yaml-mode-hook 'rinari-launch  'append)))
 
 
 (eval-after-load "rinari"
@@ -83,6 +87,9 @@
                                         dotemacs-rails-dir
                                       default-directory))))
     (info filepath)))
+
+;; this would make `rinari-web-server' happy on emacs-23
+(setq compilation-save-buffers-predicate nil)
 
 ;; ** projectile-rails: a replacement for rinari
 ;; https://github.com/asok/projectile-rails
