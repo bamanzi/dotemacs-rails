@@ -12,6 +12,9 @@
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
   )
 
+(when (bound 'ac-modes)
+  (add-to-list 'ac-modes 'web-mode))
+
 ;; *** multi-web-mode
 (autoload 'multi-web-mode "multi-web-mode"
   "Enables the multi web mode chunk detection and indentation" t)
@@ -50,8 +53,11 @@
   "Major mode for editing JavaScript source text." t)
 
 ;;it's already in gnu emacs 23.2+ (renamed to 'js-mode')
-(if (string< emacs-version "23.2")
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . espresso-mode)))
+(when (string< emacs-version "23.2")
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . espresso-mode))
+  (when (bound 'ac-modes)
+    (add-to-list 'ac-modes 'espresso-mode))
+  )
 
 ;; *** js2-mode
 ;;this fork is maintained actively: https://github.com/mooz/js2-mode

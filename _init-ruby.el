@@ -20,6 +20,10 @@
           "Vagrantfile\\'"))
   (message "Ruby files now associated to major mode `%s'. Call `M-x ruby-set-major-mode` to change it." mode))
 
+(when (boundp 'ac-modes)
+  (add-to-list 'ac-modes 'ruby-mode)
+  (add-to-list 'ac-modes 'enh-ruby-mode))
+
 ;; *** ruby-mode
 (ruby-set-major-mode 'ruby-mode)
 
