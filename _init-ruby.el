@@ -225,7 +225,7 @@ A process is considered alive if its status is `run', `open',
 (autoload 'yari-anything "yari"
   "Undocumented." t)
 
-(eval-after-load "ruby"
+(eval-after-load "ruby-mode"
   `(progn
      (define-key ruby-mode-map (kbd "C-c <f1>") 'yari-anything)
      ))
@@ -285,7 +285,7 @@ A process is considered alive if its status is `run', `open',
   "Run on current file." t)
 
 
-;; ** misc
+;; ** code editing
 ;; *** ruby-block
 (autoload 'ruby-block-mode  "ruby-block"
   "In ruby-mode, Displays the line where there is keyword corresponding" t)
@@ -293,16 +293,34 @@ A process is considered alive if its status is `run', `open',
 
 (add-hook 'ruby-mode-hook 'ruby-block-mode)
 
+;; *** ruby-tools: string/symbol conversion
+(eval-after-load "ruby-mode"
+  `(progn
+     (require 'ruby-tools nil t)))
+
+;; *** which-func
+(eval-after-load "which-func"
+  `(progn
+     (add-to-list 'which-func-modes 'ruby-mode)
+     (add-to-list 'which-func-modes 'enh-ruby-mode)
+     ))
+
+;; *** ctags
+(eval-after-load "anything-config"
+  `(progn
+     (add-to-list 'anything-c-ctags-modes 'ruby-mode)
+     (add-to-list 'anything-c-ctags-modes 'enh-ruby-mode)
+     (add-to-list 'anything-c-ctags-modes 'js-mode)
+     ))
+
+
+;; ** misc
+
 ;; *** rake
 (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
 
 (autoload 'rake "rake"
   "Runs rake command." t)
-
-;; *** ruby-tools: string/symbol conversion
-(eval-after-load "ruby-mode"
-  `(progn
-     (require 'ruby-tools nil t)))
 
 ;; *** speedbar
 (eval-after-load "speedbar"
@@ -311,13 +329,6 @@ A process is considered alive if its status is `run', `open',
      (speedbar-add-supported-extension ".erb")
      (speedbar-add-supported-extension ".yml")
      (speedbar-add-supported-extension ".rake")
-     ))
-
-;; *** which-func
-(eval-after-load "which-func"
-  `(progn
-     (add-to-list 'which-func-modes 'ruby-mode)
-     (add-to-list 'which-func-modes 'enh-ruby-mode)
      ))
 
 ;; *** milkode (similar to grep but with pre-index feature)
@@ -341,10 +352,3 @@ A process is considered alive if its status is `run', `open',
 
 (defalias 'find-gem 'anything-rubygems-local)
 
-;; *** anything
-(eval-after-load "anything-config"
-  `(progn
-     (add-to-list 'anything-c-ctags-modes 'ruby-mode)
-     (add-to-list 'anything-c-ctags-modes 'enh-ruby-mode)
-     (add-to-list 'anything-c-ctags-modes 'js-mode)
-     ))
