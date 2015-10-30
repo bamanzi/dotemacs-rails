@@ -1,4 +1,12 @@
 ;; * ruby
+;; ** rvm
+(autoload 'rvm-use "rvm"
+  "switch the current ruby version to any ruby, which is installed with rvm" t)
+
+(autoload 'rvm-use-default "rvm"
+  "use the rvm-default ruby as the current ruby version" t)
+
+
 ;; ** major mode
 (defun ruby-set-major-mode (mode)
   (interactive (list
