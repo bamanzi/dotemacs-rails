@@ -298,6 +298,10 @@ A process is considered alive if its status is `run', `open',
   `(progn
      (require 'ruby-tools nil t)))
 
+;; *** ruby-hash-syntax
+(autoload 'ruby-toggle-hash-syntax "ruby-hash-syntax"
+  "Toggle syntax of ruby hash literal in region from BEG to END between ruby 1.8 and 1.9 styles." t)
+
 ;; *** which-func
 (eval-after-load "which-func"
   `(progn
