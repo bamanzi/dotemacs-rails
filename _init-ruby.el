@@ -18,7 +18,7 @@
             (let ((pair (assoc ext auto-mode-alist)))
               (if pair
                   (setcdr pair mode)
-                (add-to-list 'auto-mode-alist ,'(ext . mode)))))
+                (add-to-list 'auto-mode-alist (cons ext mode)))))
         '("\\.rb\\'"                    ; enh-ruby-mode would set this
           "Rakefile\\'"                 ; enh-ruby-mode would set this
           "\\.gemspec\\'"               ; enh-ruby-mode would set this

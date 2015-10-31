@@ -12,7 +12,7 @@
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
   )
 
-(when (bound 'ac-modes)
+(when (boundp 'ac-modes)
   (add-to-list 'ac-modes 'web-mode))
 
 ;; *** multi-web-mode
@@ -55,7 +55,7 @@
 ;;it's already in gnu emacs 23.2+ (renamed to 'js-mode')
 (when (string< emacs-version "23.2")
   (add-to-list 'auto-mode-alist '("\\.js\\'" . espresso-mode))
-  (when (bound 'ac-modes)
+  (when (boundp 'ac-modes)
     (add-to-list 'ac-modes 'espresso-mode))
   )
 
