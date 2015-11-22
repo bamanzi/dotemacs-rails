@@ -1,10 +1,10 @@
 ;;; ruby-tools.el --- Collection of handy functions for ruby-mode
 
-;; Copyright (C) 2012 Johan Andersson
+;; Copyright (C) 2012-2013 Johan Andersson
 
 ;; Author: Johan Andersson <johan.rejeep@gmail.com>
 ;; Maintainer: Johan Andersson <johan.rejeep@gmail.com>
-;; Version: 0.1.0
+;; Version: 0.1.2
 ;; Keywords: speed, convenience, ruby
 ;; URL: http://github.com/rejeep/ruby-tools
 
@@ -83,7 +83,7 @@
 
 (defun ruby-tools-string-region ()
   "Return region for string at point."
-  (let ((orig-point (point)) (regex "\\([\"']\\)\\(?:[^\\1]\\|\\\\.\\)*?\\(\\1\\)") beg end)
+  (let ((orig-point (point)) (regex "'\\(\\(\\\\'\\)\\|[^']\\)*'\\|\"\\(\\(\\\\\"\\)\\|[^\"]\\)*\"") beg end)
     (save-excursion
       (goto-char (line-beginning-position))
       (while (and (re-search-forward regex (line-end-position) t) (not (and beg end)))
@@ -122,7 +122,7 @@
              (min (nth 0 region))
              (max (nth 1 region))
              (content (buffer-substring-no-properties (1+ min) (1- max))))
-        (when (string-match-p "^\\([a-ZA-Z_][a-ZA-Z0-9_]+\\)?$" content)
+        (when (string-match-p "^\\([a-ZA-Z_][a-ZA-Z0-9_]*\\)?$" content)
           (let ((orig-point (point)))
             (delete-region min max)
             (insert (concat ":" content))
