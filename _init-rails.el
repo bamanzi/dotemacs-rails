@@ -132,3 +132,20 @@
   (interactive)
   (require 'realgud)
   (rdebug "rdebug script/rails -- server"))
+
+;; *** Capitalize keywords in SQL mode
+(autoload 'sqlup-mode  "sqlup-mode"
+  "Capitalizes SQL keywords for you." t)
+
+(autoload 'sqlup-capitalize-keywords-in-region "sqlup-mode"
+  "Call this function on a region to capitalize the SQL keywords therein." t)
+
+(eval-after-load "sql"
+  `(progn
+     (add-hook 'sql-mode-hook 'sqlup-mode)
+     ;; Capitalize keywords in an interactive session (e.g. psql)
+     (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+     ;; Set a global keyword to use sqlup on a region
+     (global-set-key (kbd "C-c u") 'sqlup-capitalize-keywords-in-region)
+     ))
+
