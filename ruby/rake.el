@@ -4,7 +4,7 @@
 
 ;; Author:            Adam Sokolnicki <adam.sokolnicki@gmail.com>
 ;; URL:               https://github.com/asok/rake.el
-;; Version:           0.2.0
+;; Version:           0.3.3
 ;; Keywords:          rake, ruby
 ;; Package-Requires:  ((f "0.13.0") (dash "1.5.0") (cl-lib "0.5"))
 
@@ -40,18 +40,18 @@
 (require 'f)
 
 (defmacro rake--with-root (root body-form)
-  `(let* ((default-directory root))
+  `(let* ((default-directory ,root))
      ,body-form))
 
-(defmacro rake--choose-command-prefix (root &rest cases)
-  `(cond ((rake--spring-p root)
-          ,(plist-get cases :spring))
-         ((rake--zeus-p root)
-          ,(plist-get cases :zeus))
-         ((rake--bundler-p root)
-          ,(plist-get cases :bundler))
-         (t
-          ,(plist-get cases :vanilla))))
+(defun rake--choose-command-prefix (root cases)
+  (cond ((rake--spring-p root)
+         (plist-get cases :spring))
+        ((rake--zeus-p root)
+         (plist-get cases :zeus))
+        ((rake--bundler-p root)
+         (plist-get cases :bundler))
+        (t
+         (plist-get cases :vanilla))))
 
 (defcustom rake-enable-caching t
   "When t enables tasks caching."
@@ -74,12 +74,13 @@
 (defconst rake--omit-cache   16)
 
 (defun rake--spring-p (root)
-  (file-exists-p (f-canonical
-                  (concat
-                   temporary-file-directory
-                   "spring/"
-                   (md5 root 0 -1)
-                   ".pid"))))
+  (let ((path (concat temporary-file-directory "spring/%s"))
+        (ruby-version (shell-command-to-string "ruby -e 'print RUBY_VERSION'")))
+    (or
+     (file-exists-p (f-canonical
+                     (format path (concat (md5 root 0 -1) ".pid"))))
+     (file-exists-p (f-canonical
+                     (format path (md5 (concat ruby-version root) 0 -1)))))))
 
 (defun rake--zeus-p (root)
   (file-exists-p (expand-file-name ".zeus.sock" root)))
@@ -102,7 +103,7 @@
 (defun rake--root ()
   (file-truename (locate-dominating-file default-directory "Rakefile")))
 
-(defun rake--unserialize-cache ()
+(defun rake--deserialize-cache ()
   "Read data serialized by `rake--serialize-cache' from `rake-cache-file'."
   (when (file-exists-p rake-cache-file)
     (with-temp-buffer
@@ -110,12 +111,16 @@
       (read (buffer-string)))))
 
 (defvar rake--cache
-  (or (rake--unserialize-cache)
+  (or (rake--deserialize-cache)
       (make-hash-table :test 'equal)))
+
+(defvar rake--last-root nil)
+(defvar rake--last-task nil)
+(defvar rake--last-mode nil)
 
 (defun rake--serialize-cache ()
   "Serialize `rake--cache' to `rake-cache-file'.
-The saved data can be restored with `rake--unserialize-cache'."
+The saved data can be restored with `rake--deserialize-cache'."
   (when (file-writable-p rake-cache-file)
     (with-temp-file rake-cache-file
       (insert (let (print-length) (prin1-to-string rake--cache))))))
@@ -123,10 +128,10 @@ The saved data can be restored with `rake--unserialize-cache'."
 (defun rake--tasks-output (root)
   (shell-command-to-string
    (rake--choose-command-prefix root
-                                :zeus "zeus rake -T -A"
-                                :spring "spring rake -T -A"
-                                :bundler "bundle exec rake -T -A"
-                                :vanilla "rake -T -A")))
+                                (list :zeus "zeus rake -T -A"
+                                      :spring "bundle exec spring rake -T -A"
+                                      :bundler "bundle exec rake -T -A"
+                                      :vanilla "rake -T -A"))))
 
 (defun rake--parse-tasks (output)
   "Parses the OUTPUT of rake command with list of tasks. Returns a list of tasks."
@@ -136,7 +141,7 @@ The saved data can be restored with `rake--unserialize-cache'."
                  (split-string output "[\n]"))))
 
 (defun rake--fresh-tasks (root)
-  "Returns list of the rake tasks for the current project."
+  "Returns list of the rake tasks for the project in ROOT."
   (rake--parse-tasks (rake--tasks-output root)))
 
 (defun rake--cached-tasks (arg root)
@@ -156,7 +161,7 @@ to `rake-cache-file'. Returns a list of the tasks for the project."
     tasks))
 
 (defun rake--cached-or-fresh-tasks (arg root)
-  "Returns a list of all the rake tasks defined in the current project.
+  "Returns a list of all the rake tasks defined for the project in ROOT.
 If `rake-enable-caching' is t look in the cache, if not fallback to calling rake."
   (if rake-enable-caching
       (rake--cached-tasks arg root)
@@ -182,6 +187,28 @@ If `rake-enable-caching' is t look in the cache, if not fallback to calling rake
                (user-error "Please install grizzl first")))
     (t (funcall rake-completion-system prompt choices))))
 
+(defun rake--read-task (root arg)
+  (let ((tasks (rake--cached-or-fresh-tasks arg root)))
+    (rake--trim-docstring
+     (rake--completing-read "Rake task: "
+                            (if (rake--vertical-completion-system-p)
+                                tasks
+                              (rake--tasks-without-doscstrings tasks))))))
+
+(defun rake-compile (root task mode)
+  (setq rake--last-root root
+        rake--last-task task
+        rake--last-mode mode)
+  (rake--with-root root (compile task mode)))
+
+;;;###autoload
+(defun rake-rerun ()
+  "Re-runs the last task"
+  (interactive)
+  (when (not rake--last-root)
+    (error "No task was run"))
+  (rake-compile rake--last-root rake--last-task rake--last-mode))
+
 (define-derived-mode rake-compilation-mode compilation-mode "Rake Compilation"
   "Compilation mode used by `rake' command.")
 
@@ -192,29 +219,42 @@ If `rake-enable-caching' is t look in the cache, if not fallback to calling rake
   (rake--regenerate-cache (rake--root)))
 
 ;;;###autoload
+(defun rake-find-task (arg)
+  "Finds a rake task."
+  (interactive "P")
+  (let* ((root (or (rake--root) (user-error "Rakefile not found")))
+         (arg (or (car arg) 0))
+         (prefix (rake--choose-command-prefix root
+                                              (list :spring  "bundle exec spring rake --where "
+                                                    :zeus    "zeus rake --where "
+                                                    :bundler "bundle exec rake --where "
+                                                    :vanilla "rake --where ")))
+         (task (rake--read-task root arg))
+         (output (shell-command-to-string (concat prefix task))))
+    (when (string-match "^rake [a-zA-Z:]+[ ]+\\([^ ]+\\):\\([0-9]+\\):" output)
+      ;; find-file will alter the match data so we introduce let here
+      (let ((file-name (match-string 1 output))
+            (line-num (string-to-number (match-string 2 output))))
+        (find-file file-name)
+        (goto-line line-num)))))
+
+;;;###autoload
 (defun rake (arg &optional compilation-mode)
   "Runs rake command."
   (interactive "P")
   (let* ((root (or (rake--root) (user-error "Rakefile not found")))
          (arg (or (car arg) 0))
          (prefix (rake--choose-command-prefix root
-                                              :spring  "spring rake "
-                                              :zeus    "zeus rake "
-                                              :bundler "bundle exec rake "
-                                              :vanilla "rake "))
-         (prompt "Rake: ")
-         (tasks (rake--cached-or-fresh-tasks arg root))
-         (task (rake--trim-docstring
-                (rake--completing-read prompt
-                                       (if (rake--vertical-completion-system-p)
-                                           tasks
-                                         (rake--tasks-without-doscstrings tasks)))))
-         (command (if (= arg rake--edit-command)
-                      (read-string prompt (concat prefix task " "))
-                    (concat prefix task))))
-    (rake--with-root
-     root
-     (compile command (or compilation-mode 'rake-compilation-mode)))))
+                                              (list :spring  "bundle exec spring rake "
+                                                    :zeus    "zeus rake "
+                                                    :bundler "bundle exec rake "
+                                                    :vanilla "rake ")))
+         (task (rake--read-task root arg))
+         (task (if (= arg rake--edit-command)
+                   (read-string "Rake command: " (concat prefix task " "))
+                 (concat prefix task)))
+         (mode (or compilation-mode 'rake-compilation-mode)))
+    (rake-compile root task mode)))
 
 (provide 'rake)
 
