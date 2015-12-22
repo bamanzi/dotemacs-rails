@@ -356,3 +356,9 @@ A process is considered alive if its status is `run', `open',
 
 (defalias 'find-gem 'anything-rubygems-local)
 
+;; *** cucumber
+(autoload 'feature-mode "feature-mode"
+  "Major mode for editing plain text stories" t)
+
+(add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+
