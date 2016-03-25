@@ -1,4 +1,4 @@
-# Robe [![Build Status](https://travis-ci.org/dgutov/robe.png?branch=master)](https://travis-ci.org/dgutov/robe)
+# Robe [![Build Status](https://travis-ci.org/dgutov/robe.png?branch=master)](https://travis-ci.org/dgutov/robe) [![MELPA](http://melpa.org/packages/robe-badge.svg)](http://melpa.org/#/robe)
 
 Robe is a code assistance tool that uses a Ruby REPL subprocess with
 your application or gem code loaded, to provide information about
@@ -30,7 +30,7 @@ To see the available commands, type <kbd>M-x describe-package RET robe RET</kbd>
 
 ## Details
 
-When peforming one of the commands defined here, we either need to
+When performing one of the commands defined here, we either need to
 narrow the method name at point down to a specific method in a specific
 module, or enumerate the possible method names or constants allowed at
 point (for code completion).
@@ -73,7 +73,8 @@ Note that if your project is using `Bundler`, the dependencies have to be added 
 ### [company-mode](http://company-mode.github.com/) ([screenshot](screenshots/company-robe.png)):
 
 ```lisp
-(push 'company-robe company-backends)
+(eval-after-load 'company
+  '(push 'company-robe company-backends))
 ```
 
 ### [auto-complete](http://auto-complete.org/):
@@ -151,5 +152,3 @@ You should have received a copy of the GNU General Public License
 along with GNU Emacs; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
-
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/de7c96160d19b6945b432196a97eaaf3 "githalytics.com")](http://githalytics.com/dgutov/robe)

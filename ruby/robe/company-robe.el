@@ -1,7 +1,7 @@
 (eval-when-compile (require 'robe))
 
 ;;;###autoload
-(defun company-robe (command &optional arg)
+(defun company-robe (command &optional arg &rest ignore)
   "A `company-mode' completion back-end for `robe-mode'."
   (interactive (list 'interactive))
   (case command
@@ -37,7 +37,7 @@
                              for module = (robe-spec-module spec)
                              when module
                              collect (cons module spec))))
-            (cdr (assoc (ido-completing-read "Module: " alist nil t) alist)))
+            (cdr (assoc (robe-completing-read "Module: " alist nil t) alist)))
         (car specs)))))
 
 (provide 'company-robe)

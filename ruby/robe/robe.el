@@ -1,11 +1,11 @@
 ;;; robe.el --- Code navigation, documentation lookup and completion for Ruby
 
 ;; Copyright © 2012 Phil Hagelberg
-;; Copyright © 2012, 2013 Dmitry Gutov
+;; Copyright © 2012-2015 Dmitry Gutov
 
 ;; Author: Dmitry Gutov
 ;; URL: https://github.com/dgutov/robe
-;; Version: 0.7.7
+;; Version: 0.7.9
 ;; Keywords: ruby convenience rails
 ;; Package-Requires: ((inf-ruby "2.3.0"))
 
@@ -68,30 +68,37 @@
 have constants, methods and arguments highlighted in color."
   :group 'robe)
 
-(defcustom robe-turn-on-eldoc t
-  "When non-nil, `robe-mode' will turn on `eldoc-mode'."
-  :group 'robe)
-
 (defvar robe-ruby-path
   (let ((current (or load-file-name (buffer-file-name))))
     (expand-file-name "lib" (file-name-directory current)))
   "Path to the backend Ruby code.")
 
-(defvar robe-port 24969)
+(defvar robe-port nil)
 
 (defvar robe-jump-conservative nil)
 
 (defvar robe-running nil)
 
-(defcustom robe-completing-read-func 'ido-completing-read
-  "Function to call for completing read."
+(defcustom robe-completing-read-func 'completing-read-default
+  "Function to call for completing reads, to resolve ambiguous names.
+
+Will not be used when either `completing-read' or
+`completing-read-function' are [temporarily] overridden by user
+or another package."
   :type '(choice (const :tag "Ido" ido-completing-read)
-                 (const :tag "Plain" completing-read)
+                 (const :tag "Plain" completing-read-default)
                  (function :tag "Other function"))
   :group 'robe)
 
 (defun robe-completing-read (&rest args)
-  (apply robe-completing-read-func args))
+  (let ((completing-read-function
+         ; 1) allow read-function override. Subtle: an *old* customization
+         ; value 'completing-read would cause infinite loop, so avoid.
+         (if (and (eq completing-read-function 'completing-read-default)
+                  (not (eq robe-completing-read-func 'completing-read)))
+             robe-completing-read-func
+           completing-read-function)))
+    (apply #'completing-read args)))      ; 2) allow completing-read override
 
 (defun robe-start (&optional force)
   "Start Robe server if it isn't already running.
@@ -99,16 +106,18 @@ When called with a prefix argument, kills the current Ruby
 process, if any, and starts a new console for the current
 project."
   (interactive "P")
-  (let ((process (get-buffer-process inf-ruby-buffer)))
+  (let* ((ruby-buffer (and inf-ruby-buffer
+                           (get-buffer inf-ruby-buffer)))
+         (process (get-buffer-process ruby-buffer)))
     (when (or force (not process))
       (setq robe-running nil)
       (when process
         (delete-process process))
-      (when (buffer-live-p inf-ruby-buffer)
-        (kill-buffer inf-ruby-buffer))
       (if (or force
               (yes-or-no-p "No Ruby console running. Launch automatically?"))
           (let ((conf (current-window-configuration)))
+            (when (buffer-live-p ruby-buffer)
+              (kill-buffer ruby-buffer))
             (inf-ruby-console-auto)
             (set-window-configuration conf))
         (error "Aborted"))))
@@ -118,9 +127,12 @@ project."
            (comint-filter (process-filter proc))
            (tmp-filter (lambda (p s)
                          (cond
-                          ((string-match-p "robe on" s)
-                           (setq started t))
-                          ((string-match-p "Error" s)
+                          ((string-match "robe on \\([0-9]+\\)" s)
+                           (setq started t)
+                           (setq robe-port (string-to-number
+                                            (match-string 1 s))))
+                          ((let (case-fold-search)
+                             (string-match-p "Error\\>" s))
                            (setq failed t)))
                          (funcall comint-filter p s)))
            (script (format (mapconcat #'identity
@@ -128,9 +140,9 @@ project."
                                         "  $:.unshift '%s'"
                                         "  require 'robe'"
                                         "end"
-                                        "Robe.start(%d)\n")
+                                        "Robe.start\n")
                                       ";")
-                           robe-ruby-path robe-port)))
+                           robe-ruby-path)))
       (unwind-protect
           (progn
             (set-process-filter proc tmp-filter)
@@ -140,10 +152,15 @@ project."
               (when failed
                 (ruby-switch-to-inf t)
                 (error "Robe launch failed"))
-              (accept-process-output proc)))
+              (accept-process-output proc))
+            (set-process-sentinel proc #'robe-process-sentinel))
         (set-process-filter proc comint-filter)))
     (when (robe-request "ping") ;; Should be always t when no error, though.
       (setq robe-running t))))
+
+(defun robe-process-sentinel (proc _event)
+  (when (memq (process-status proc) '(signal exit))
+    (setq robe-running nil)))
 
 (defun robe-request (endpoint &rest args)
   (declare (special url-http-end-of-headers))
@@ -155,6 +172,7 @@ project."
                                          (t "-")))
                                  args "/")))
          (response-buffer (robe-retrieve url)))
+    (message nil) ;; So "Contacting host" message is cleared
     (if response-buffer
         (prog1
             (with-current-buffer response-buffer
@@ -231,9 +249,6 @@ If invoked with a prefix or no symbol at point, delegate to `robe-ask'."
         (when (string= thing "super")
           (setq thing (third ctx)
                 super t)))
-      (when (and target (string= thing "new"))
-        (setq thing "initialize"
-              instance t))
       (when (and target (save-excursion
                           (end-of-thing 'symbol)
                           (looking-at " *=[^=]")))
@@ -280,7 +295,8 @@ If invoked with a prefix or no symbol at point, delegate to `robe-ask'."
       (robe-find-file file)
       (goto-char (point-min))
       (let* ((nesting (split-string name "::"))
-             (cnt (1- (length nesting))))
+             (cnt (1- (length nesting)))
+             case-fold-search)
         (re-search-forward (concat "^[ \t]*\\(class\\|module\\) +.*\\_<"
                                    (loop for i from 1 to cnt
                                          concat "\\(")
@@ -460,11 +476,11 @@ Only works with Rails, see e.g. `rinari-console'."
 (defun robe-doc-fontify-c-string (string)
   (with-temp-buffer
     (insert string)
-    (let ((delay-mode-hooks t))
-      (c-mode))
-    (run-hooks 'font-lock-mode-hook)
-    (font-lock-fontify-buffer)
-    (buffer-string)))
+    (delay-mode-hooks
+      (c-mode)
+      (run-hooks 'font-lock-mode-hook)
+      (font-lock-fontify-buffer)
+      (buffer-string))))
 
 (defun robe-toggle-source (button)
   (let* ((end (button-end button))
@@ -606,7 +622,10 @@ Only works with Rails, see e.g. `rinari-console'."
 
 (defun robe-complete-symbol-p (beginning)
   (not (or (eq (char-before beginning) ?@)
-           (eq (char-after beginning) ?:)
+           (and
+            ;; Implement symbol completion using Symbol.all_symbols.
+            (eq (char-after beginning) ?:)
+            (not (eq (char-after (1+ beginning)) ?:)))
            (memq (get-text-property beginning 'face)
                  (list font-lock-keyword-face
                        font-lock-function-name-face
@@ -683,9 +702,7 @@ The following commands are available:
 \\{robe-mode-map}"
   nil " robe" robe-mode-map
   (add-hook 'completion-at-point-functions 'robe-complete-at-point nil t)
-  (when robe-turn-on-eldoc
-    (set (make-local-variable 'eldoc-documentation-function) 'robe-eldoc)
-    (turn-on-eldoc-mode)))
+  (set (make-local-variable 'eldoc-documentation-function) #'robe-eldoc))
 
 (provide 'robe)
 ;;; robe.el ends here
