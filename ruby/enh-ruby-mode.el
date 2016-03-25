@@ -132,6 +132,10 @@ the value changes.
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-hanging-brace-deep-indent-level 'safe-local-variable 'integerp)
 
+(defcustom enh-ruby-add-encoding-comment-on-save t
+  "Adds ruby magic encoding comment on save when non-nil."
+  :type 'boolean :group 'enh-ruby)
+
 (defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
   "Alist to map encoding name from emacs to ruby."
   :group 'enh-ruby)
@@ -236,22 +240,22 @@ the value changes.
 
 \\{enh-ruby-mode-map}"
 
-  (set (make-local-variable 'comment-column)               enh-ruby-comment-column)
-  (set (make-local-variable 'comment-end)                  "")
-  (set (make-local-variable 'comment-start)                "#")
-  (set (make-local-variable 'comment-start-skip)           "#+ *")
-  (set (make-local-variable 'erm-buff-num)                 nil)
-  (set (make-local-variable 'erm-e-w-status)               nil)
-  (set (make-local-variable 'erm-full-parse-p)             nil)
-  (set (make-local-variable 'indent-line-function)         'enh-ruby-indent-line)
-  (set (make-local-variable 'need-syntax-check-p)          nil)
-  (set (make-local-variable 'paragraph-ignore-fill-prefix) t)
-  (set (make-local-variable 'paragraph-separate)           paragraph-start)
-  (set (make-local-variable 'parse-sexp-ignore-comments)   t)
-  (set (make-local-variable 'parse-sexp-lookup-properties) t)
-  (set (make-local-variable 'require-final-newline)        t)
-
-  (set (make-local-variable 'forward-sexp-function) 'enh-ruby-forward-sexp)
+  (setq-local comment-column               enh-ruby-comment-column)
+  (setq-local comment-end                  "")
+  (setq-local comment-start                "#")
+  (setq-local comment-start-skip           "#+ *")
+  (setq-local erm-buff-num                 nil)
+  (setq-local erm-e-w-status               nil)
+  (setq-local erm-full-parse-p             nil)
+  (setq-local indent-line-function         'enh-ruby-indent-line)
+  (setq-local need-syntax-check-p          nil)
+  (setq-local paragraph-ignore-fill-prefix t)
+  (setq-local paragraph-separate           paragraph-start)
+  (setq-local parse-sexp-ignore-comments   t)
+  (setq-local parse-sexp-lookup-properties t)
+  (setq-local require-final-newline        t)
+  (setq-local beginning-of-defun-function  'enh-ruby-beginning-of-defun)
+  (setq-local end-of-defun-function        'enh-ruby-end-of-defun)
 
   (set (make-local-variable 'paragraph-start)
        (concat "$\\|" page-delimiter))
@@ -262,7 +266,9 @@ the value changes.
   (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
   (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
-  (add-hook 'before-save-hook       'enh-ruby-mode-set-encoding nil t)
+  (if enh-ruby-add-encoding-comment-on-save
+    (add-hook 'before-save-hook 'enh-ruby-mode-set-encoding nil t))
+
   (add-hook 'change-major-mode-hook 'erm-major-mode-changed     nil t)
   (add-hook 'kill-buffer-hook       'erm-buffer-killed          nil t)
 
@@ -953,29 +959,40 @@ With ARG, do it that many times."
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
-  (if (< arg 0)
-      (enh-ruby-backward-sexp (- arg))
-    (while (>= (setq arg (1- arg)) 0)
-      (let* ((pos (point))
-             (prop (get-text-property pos 'indent))
-             (count 0))
+  (let ((i (or arg 1)))
+    (cond
+     ((< i 0)
+      (enh-ruby-backward-sexp (- i)))
+     (t
+      (skip-syntax-forward " ")
+      (while (> i 0)
+        (let* ((pos (point))
+               (prop (get-text-property pos 'indent))
+               (count 0))
 
-        (unless (or (eq prop 'l) (eq prop 'b) (eq prop 'd))
-          (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
-                          (get-text-property pos 'indent))))
+          (unless (memq prop '(l b d))
+            (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
+                            (get-text-property pos 'indent))))
 
-        (while (< 0 (setq count
-                          (cond
-                           ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1+ count))
-                           ((or (eq prop 'r) (eq prop 'e)) (1- count))
-                           ((eq prop 'c) count)
-                           ((eq prop 's) (if (= 0 count) 1 count))
-                           (t 0))))
-          (goto-char pos)
-          (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
-                          (get-text-property pos 'indent))))
+          (while (< 0 (setq count
+                            (cond
+                             ((memq prop '(l b d)) (1+ count))
+                             ((memq prop '(r e))   (1- count))
+                             ((memq prop '(c))     count)
+                             ((memq prop '(s))     (if (= 0 count) 1 count))
+                             (t                    0))))
+            (goto-char pos)
+            (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
+                            (get-text-property pos 'indent))))
 
-        (goto-char (if prop pos (point-max)))))))
+          (goto-char (if prop pos (point-max)))
+
+          (cond ((looking-at "end")     ; move past end/}/]/)
+                 (forward-word 1))
+                ((looking-at "}\\|)\\|]")
+                 (forward-char 1))))
+
+        (setq i (1- i)))))))
 
 (defun enh-ruby-insert-end ()
   (interactive)
@@ -1185,13 +1202,6 @@ With ARG, do it that many times."
       (error "%s" (substring response 1))))))
 
 (erm-reset)
-
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.rb\\'" . enh-ruby-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("Rakefile\\'" . enh-ruby-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.gemspec\\'" . enh-ruby-mode))
 
 (provide 'enh-ruby-mode)
 
