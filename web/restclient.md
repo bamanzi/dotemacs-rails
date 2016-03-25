@@ -24,51 +24,54 @@ and supports a few additional keypresses:
 - `C-c C-p`: jump to the previous query
 - `C-c C-n`: jump to the next query
 - `C-c C-.`: mark the query under the cursor
+- `C-c C-u`: copy query under the cursor as a curl command
 
 Query file example:
 
-        # -*- restclient -*-
-        #
-        # Gets user timeline, formats JSON, shows response status and headers underneath
-        #
-        #
-        GET http://api.twitter.com/1/statuses/user_timeline.json?screen_name=twitterapi&count=2
-        #
-        # XML is supported - highlight, pretty-print
-        #
-        GET http://www.redmine.org/issues.xml?limit=10
+    # -*- restclient -*-
+    #
+    # Gets  all Github APIs, formats JSON, shows response status and headers underneath.
+    # Also sends a User-Agent header, because the Github API requires this.
+    #
+    GET https://api.github.com
+    User-Agent: Emacs Restclient
 
-        #
-        # It can even show an image!
-        #
-        GET http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png
-        #
-        # A bit of json GET, you can pass headers too
-        #
-        GET http://jira.atlassian.com/rest/api/latest/issue/JRA-9
-        User-Agent: Emacs24
-        Accept-Encoding: application/xml
+    #
+    # XML is supported - highlight, pretty-print
+    #
+    GET http://www.redmine.org/issues.xml?limit=10
 
-        #
-        # Post works too, entity just goes after an empty line. Same is for PUT.
-        #
-        POST https://jira.atlassian.com/rest/api/2/search
-        Content-Type: application/json
+    #
+    # It can even show an image!
+    #
+    GET http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png
+    #
+    # A bit of json GET, you can pass headers too
+    #
+    GET http://jira.atlassian.com/rest/api/latest/issue/JRA-9
+    User-Agent: Emacs24
+    Accept-Encoding: compress, gzip
 
-        {
-                "jql": "project = HSP",
-                "startAt": 0,
-                "maxResults": 15,
-                "fields": [
-                        "summary",
-                        "status",
-                        "assignee"
-                ]
-        }
-        #
-        # And delete, will return not-found error...
-        #
-        DELETE https://jira.atlassian.com/rest/api/2/version/20
+    #
+    # Post works too, entity just goes after an empty line. Same is for PUT.
+    #
+    POST https://jira.atlassian.com/rest/api/2/search
+    Content-Type: application/json
+
+    {
+            "jql": "project = HSP",
+            "startAt": 0,
+            "maxResults": 15,
+            "fields": [
+                    "summary",
+                    "status",
+                    "assignee"
+            ]
+    }
+    #
+    # And delete, will return not-found error...
+    #
+    DELETE https://jira.atlassian.com/rest/api/2/version/20
 
 
 Lines starting with `#` are considered comments AND also act as separators.
@@ -114,12 +117,54 @@ the example above.
 
 And be careful of what you put in that elisp. No security checks are done, so it can format your hardrive. If there's a parsing or evaluation error, it will tell you in the minibuffer.
 
+# Customization
+
+There are several variables available to customize `restclient` to your liking.
+
+### restclient-log-request
+
+__Default: t__
+
+Determines whether restclient logs to the \*Messages\* buffer.
+
+If non-nil, restclient requests will be logged. If nil, they will not be.
+
+### restclient-same-buffer-response
+
+__Default: t__
+
+Re-use same buffer for responses or create a new one each time.
+
+If non-nil, re-use the buffer named by `rest-client-buffer-response-name` for all requests.
+
+If nil, generate a buffer name based on the request type and url, and increment it for subsequent requests.
+
+For example, `GET http://example.org` would produce the following buffer names on 3 subsequent calls:
+- `*HTTP GET http://example.org*`
+- `*HTTP GET http://example.org*<2>`
+- `*HTTP GET http://example.org*<3>`
+
+### restclient-same-buffer-response-name
+
+__Default: \*HTTP Response\*__
+
+Name for response buffer to be used when `restclient-same-buffer-response` is true.
+
+### restclient-inhibit-cookies
+
+__Default: nil__
+
+Inhibit restclient from sending cookies implicitly.
+
 # Known issues
 
-- Comment lines `#` act as end of enitity. Yes, that means you can't post shell script or anything with hashes as PUT/POST entity. I'm fine with this right now,
+- Comment lines `#` act as end of entity. Yes, that means you can't post shell script or anything with hashes as PUT/POST entity. I'm fine with this right now,
 but may use more unique separator in future.
 - I'm not sure if it handles different encodings, I suspect it won't play well with anything non-ascii. I'm yet to figure it out.
 - Variables usages are not highlighted
+- Due to a [bug](http://debbugs.gnu.org/cgi/bugreport.cgi?bug=17976) in
+  Emacs/url.el, some GET requests to `localhost` might fail. As a workaround you
+  can use `127.0.0.1` instead of `localhost` until this is fixed.
 
 # License
 
