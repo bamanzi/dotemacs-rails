@@ -107,6 +107,9 @@
 (autoload 'css-property "know-your-css-well"
   "Undocumented." t) 
 
+(autoload 'media-type  "media-types"
+  "Display the template of a media-type" t)
+
 ;; *** restclient
 (autoload 'restclient-mode "restclient"
   "Major-mode." t)
