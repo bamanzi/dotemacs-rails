@@ -355,9 +355,15 @@ A process is considered alive if its status is `run', `open',
 ;; *** bundler
 (autoload 'bundle-open "bundler"
   "Queries for a gem name and opens the location of the gem in dired." t)
-
 ;;(defalias 'find-gem 'bundle-open)
 
+(autoload 'bundle-show "bundler"
+  "Shows all gems that are part of the bundle, or the path to a given gem" t)
+
+(autoload 'bundle-exec "bundler"
+  "Invoke `bundle exec xxxx`" t)
+
+;; *** gem locating
 (autoload 'anything-rubygems-local "anything-rubygems-local"
   "Undocumented." t)
 

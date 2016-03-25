@@ -6,8 +6,8 @@
 ;; URL: http://github.com/tobiassvn/
 ;; Keywords: bundler ruby
 ;; Created: 31 Dec 2011
-;; Version: 1.1.0
-;; Package-Requires: ((inf-ruby "2.1"))
+;; Version: 1.1.1
+;; Package-Requires: ((inf-ruby "2.1") (cl-lib "0.5"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -60,6 +60,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'inf-ruby)
 
 ;;;###autoload
@@ -107,9 +108,63 @@
 
     (bundle-command command)))
 
+;;;###autoload
+(defun bundle-exec (command)
+  (interactive "sBundle Exec: ")
+  (run-bundled-command command))
+
+;;;###autoload
+(defun bundle-gemfile (&optional gemfile)
+  "Set BUNDLE_GEMFILE environment variable."
+  (interactive
+   (list
+    (let ((default-p
+            (let ((gemfile-dir (bundle-locate-gemfile)))
+              (if (not gemfile-dir)
+                  "Gemfile"
+                (concat gemfile-dir "Gemfile")))))
+    (read-string (format "Gemfile (%s): " default-p)
+                 default-p nil default-p))))
+  (if gemfile
+      (if (file-readable-p gemfile)
+          (progn
+            (setq bundle-gem-list-cache (make-hash-table))
+            (setenv "BUNDLE_GEMFILE" gemfile)
+            (message "BUNDLE_GEMFILE set to: %s." gemfile))
+        (message "Warning: couldn't read file \"%s\". BUNDLE_GEMFILE unchanged." gemfile))
+    (setenv "BUNDLE_GEMFILE")))
+
+;;;###autoload
+(defun bundle-outdated ()
+  "List installed gems with newer versions available."
+  (interactive)
+  (bundle-command "bundle outdated"))
+
+;;;###autoload
+(defun bundle-show ()
+  "Shows all gems that are part of the bundle, or the path to a given gem."
+  (interactive)
+  (bundle-command "bundle show"))
+
+;;;###autoload
+(defun bundle-version ()
+  "Prints version information."
+  (interactive)
+  (shell-command "bundle version"))
+
 (defun bundle-command (cmd)
   "Run cmd in an async buffer."
   (async-shell-command cmd "*Bundler*"))
+
+(defun run-bundled-command (cmd &rest args)
+  "Run bundle exec for the given command, optionally with args"
+  (interactive)
+  (let (command)
+    (setq command
+          (if args
+              (concat "bundle exec " cmd " "(mapconcat 'identity args " "))
+            (concat "bundle exec " cmd)))
+    (bundle-command command)))
 
 (defun bundle-gem-location (gem-name)
   "Returns the location of the given gem, or 'no-gemfile if the
@@ -117,14 +172,16 @@ Gemfile could not be found, or nil if the Gem could not be
 found."
   (let ((bundler-stdout
          (shell-command-to-string
-          (format "bundle show %s" (shell-quote-argument gem-name)))))
+          (format "bundle show %s" (shell-quote-argument gem-name))))
+        (remote (file-remote-p default-directory)))
     (cond
      ((string-match "Could not locate Gemfile" bundler-stdout)
       'no-gemfile)
      ((string-match "Could not find " bundler-stdout)
       nil)
      (t
-      (concat (replace-regexp-in-string
+      (concat remote
+              (replace-regexp-in-string
                "Resolving dependencies...\\|\n" ""
                bundler-stdout)
               "/")))))
@@ -133,17 +190,17 @@ found."
   (make-hash-table)
   "Holds a hash table of gem lists per directory.")
 
-(defun* bundle-locate-gemfile (&optional (dir default-directory))
-  (let ((has-gemfile (directory-files dir nil "^Gemfile$"))
-        (is-root (equal dir "/")))
-    (cond
-     (has-gemfile dir)
-     (is-root
-      (print (format
-              "No Gemfile found in either %s or any parent directory!"
-              default-directory))
-      nil)
-     ((bundle-locate-gemfile (expand-file-name ".." dir))))))
+(cl-defun bundle-locate-gemfile (&optional (dir default-directory))
+         (let ((has-gemfile (directory-files dir nil "^Gemfile$"))
+               (is-root (equal dir "/")))
+           (cond
+            (has-gemfile dir)
+            (is-root
+             (print (format
+                     "No Gemfile found in either %s or any parent directory!"
+                     default-directory))
+             nil)
+            ((bundle-locate-gemfile (expand-file-name ".." dir))))))
 
 (defun bundle-list-gems-cached ()
   (let* ((gemfile-dir (bundle-locate-gemfile))
@@ -176,6 +233,12 @@ found."
           nil)))
 
       (remq nil (mapcar 'parse-bundle-list-line bundle-lines)))))
+
+(defun bundle-list-gem-paths ()
+  (save-excursion
+    (let* ((cmd "bundle list --paths")
+           (bundle-out (shell-command-to-string cmd)))
+      (split-string bundle-out "\n"))))
 
 (provide 'bundler)
 ;;; bundler.el ends here.
