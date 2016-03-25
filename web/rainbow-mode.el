@@ -1,10 +1,10 @@
 ;;; rainbow-mode.el --- Colorize color names in buffers
 
-;; Copyright (C) 2010-2012 Free Software Foundation, Inc
+;; Copyright (C) 2010-2015 Free Software Foundation, Inc
 
 ;; Author: Julien Danjou <julien@danjou.info>
 ;; Keywords: faces
-;; Version: 0.8
+;; Version: 0.12
 
 ;; This file is part of GNU Emacs.
 
@@ -60,9 +60,9 @@
 
 ;; rgb() colors
 (defvar rainbow-html-rgb-colors-font-lock-keywords
-  '(("rgb(\s*\\([0-9]\\{1,3\\}\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\s*%\\)?\\)\s*)"
+  '(("rgb(\s*\\([0-9]\\{1,3\\}\\(?:\.[0-9]\\)?\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\\.[0-9]\\)?\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\\.[0-9]\\)?\\(?:\s*%\\)?\\)\s*)"
      (0 (rainbow-colorize-rgb)))
-    ("rgba(\s*\\([0-9]\\{1,3\\}\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\s*%\\)?\\)\s*,\s*[0-9]*\.?[0-9]+\s*%?\s*)"
+    ("rgba(\s*\\([0-9]\\{1,3\\}\\(?:\\.[0-9]\\)?\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\\.[0-9]\\)?\\(?:\s*%\\)?\\)\s*,\s*\\([0-9]\\{1,3\\}\\(?:\\.[0-9]\\)?\\(?:\s*%\\)?\\)\s*,\s*[0-9]*\.?[0-9]+\s*%?\s*)"
      (0 (rainbow-colorize-rgb)))
     ("hsl(\s*\\([0-9]\\{1,3\\}\\)\s*,\s*\\([0-9]\\{1,3\\}\\)\s*%\s*,\s*\\([0-9]\\{1,3\\}\\)\s*%\s*)"
      (0 (rainbow-colorize-hsl)))
@@ -263,9 +263,9 @@ will be enabled if a major mode has been detected from the
 
 ;; LaTeX colors
 (defvar rainbow-latex-rgb-colors-font-lock-keywords
-  '(("{rgb}{\\([0-9.]+\\),\\([0-9.]+\\),\\([0-9.]+\\)}"
+  '(("{rgb}{\\([0-9.]+\\),\s*\\([0-9.]+\\),\s*\\([0-9.]+\\)}"
      (0 (rainbow-colorize-rgb-float)))
-    ("{RGB}{\\([0-9]\\{1,3\\}\\),\\([0-9]\\{1,3\\}\\),\\([0-9]\\{1,3\\}\\)}"
+    ("{RGB}{\\([0-9]\\{1,3\\}\\),\s*\\([0-9]\\{1,3\\}\\),\s*\\([0-9]\\{1,3\\}\\)}"
      (0 (rainbow-colorize-rgb)))
     ("{HTML}{\\([0-9A-Fa-f]\\{6\\}\\)}"
      (0 (rainbow-colorize-hexadecimal-without-sharp))))
@@ -1018,11 +1018,12 @@ background is COLOR. The foreground is computed using
 
 (defun rainbow-rgb-relative-to-absolute (number)
   "Convert a relative NUMBER to absolute. If NUMBER is absolute, return NUMBER.
-This will convert \"80 %\" to 204, \"100 %\" to 255 but \"123\" to \"123\"."
+This will convert \"80 %\" to 204, \"100 %\" to 255 but \"123\" to \"123\".
+If the percentage value is above 100, it's converted to 100."
   (let ((string-length (- (length number) 1)))
     ;; Is this a number with %?
     (if (eq (elt number string-length) ?%)
-        (/ (* (string-to-number (substring number 0 string-length)) 255) 100)
+        (/ (* (min (string-to-number (substring number 0 string-length)) 100) 255) 100)
       (string-to-number number))))
 
 (defun rainbow-colorize-hsl ()
@@ -1048,6 +1049,9 @@ This will convert \"80 %\" to 204, \"100 %\" to 255 but \"123\" to \"123\"."
         (g (* (string-to-number (match-string-no-properties 2)) 255.0))
         (b (* (string-to-number (match-string-no-properties 3)) 255.0)))
     (rainbow-colorize-match (format "#%02X%02X%02X" r g b))))
+
+(defvar ansi-color-context)
+(defvar xterm-color-current)
 
 (defun rainbow-colorize-ansi ()
   "Return a matched string propertized with ansi color face."
@@ -1100,25 +1104,29 @@ Return a value between 0 and 1."
 (defun rainbow-turn-on ()
   "Turn on raibow-mode."
   (font-lock-add-keywords nil
-                          rainbow-hexadecimal-colors-font-lock-keywords)
+                          rainbow-hexadecimal-colors-font-lock-keywords
+                          t)
   ;; Activate X colors?
   (when (or (eq rainbow-x-colors t)
             (and (eq rainbow-x-colors 'auto)
                  (memq major-mode rainbow-x-colors-major-mode-list)))
     (font-lock-add-keywords nil
-                            rainbow-x-colors-font-lock-keywords))
+                            rainbow-x-colors-font-lock-keywords
+                            t))
   ;; Activate LaTeX colors?
   (when (or (eq rainbow-latex-colors t)
             (and (eq rainbow-latex-colors 'auto)
                  (memq major-mode rainbow-latex-colors-major-mode-list)))
     (font-lock-add-keywords nil
-                            rainbow-latex-rgb-colors-font-lock-keywords))
+                            rainbow-latex-rgb-colors-font-lock-keywords
+                            t))
   ;; Activate ANSI colors?
   (when (or (eq rainbow-ansi-colors t)
             (and (eq rainbow-ansi-colors 'auto)
                  (memq major-mode rainbow-ansi-colors-major-mode-list)))
     (font-lock-add-keywords nil
-                            rainbow-ansi-colors-font-lock-keywords))
+                            rainbow-ansi-colors-font-lock-keywords
+                            t))
   ;; Activate HTML colors?
   (when (or (eq rainbow-html-colors t)
             (and (eq rainbow-html-colors 'auto)
@@ -1128,7 +1136,8 @@ Return a value between 0 and 1."
              (0 (rainbow-colorize-by-assoc rainbow-html-colors-alist)))))
     (font-lock-add-keywords nil
                             `(,@rainbow-html-colors-font-lock-keywords
-                              ,@rainbow-html-rgb-colors-font-lock-keywords)))
+                              ,@rainbow-html-rgb-colors-font-lock-keywords)
+                            t))
   ;; Activate R colors?
   (when (or (eq rainbow-r-colors t)
             (and (eq rainbow-r-colors 'auto)
@@ -1138,7 +1147,7 @@ Return a value between 0 and 1."
              (0 (rainbow-colorize-by-assoc rainbow-r-colors-alist)))))
     (font-lock-add-keywords nil
                             rainbow-r-colors-font-lock-keywords
-                            )))
+                            t)))
 
 (defun rainbow-turn-off ()
   "Turn off rainbow-mode."
@@ -1159,7 +1168,9 @@ This will fontify with colors the string like \"#aabbcc\" or \"blue\"."
   (progn
     (if rainbow-mode
         (rainbow-turn-on)
-      (rainbow-turn-off))))
+      (rainbow-turn-off))
+    ;; Call font-lock-mode to refresh the buffer when used e.g. interactively
+    (font-lock-mode 1)))
 
 (provide 'rainbow-mode)
 
