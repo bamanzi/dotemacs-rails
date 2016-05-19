@@ -99,9 +99,6 @@
 ;; ** inf-ruby
 (autoload 'run-ruby "inf-ruby"
   "Run an inferior Ruby process")
-(autoload 'inf-ruby-keys "inf-ruby"
-  "Set local key defs for inf-ruby in ruby-mode")
-
 
 (defun ruby-mode-init-inf-ruby ()  
   (when (require 'inf-ruby nil t)
@@ -109,7 +106,7 @@
      ((fboundp 'inf-ruby-minor-mode)
       (inf-ruby-minor-mode 1))
      ((fboundp 'inf-ruby-setup-keybindings)
-       (inf-ruby-setup-keybindings))
+      (inf-ruby-setup-keybindings))
      ((fboundp 'inf-ruby-keys) ;;older version of inf-ruby
 	  (inf-ruby-keys))
      (t
@@ -118,6 +115,15 @@
 (eval-after-load "ruby-mode"
   `(progn
      (add-hook 'ruby-mode-hook 'ruby-mode-init-inf-ruby)
+
+     (define-key ruby-mode-map (kbd "<f9> M-`") 'inf-ruby)
+     (define-key ruby-mode-map (kbd "<f9> `") 'ruby-switch-to-inf)
+
+     (define-key ruby-mode-map (kbd "<f9> s") 'ruby-send-last-sexp)
+     (define-key ruby-mode-map (kbd "<f9> b") 'ruby-send-block)
+     ;; (define-key ruby-mode-map (kbd "<f9> C-x") 'ruby-send-definition)
+     (define-key ruby-mode-map (kbd "<f9> SPC") 'ruby-send-region)
+     (define-key ruby-mode-map (kbd "<f9> C-l") 'ruby-load-file)
      ))
 
 (eval-after-load "inf-ruby"
